@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frame_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/new_year10"
+    tools:context=".Activity.OnlineActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foreground="@drawable/alpha_background_white"></RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="4">
+
+                    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/imgAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="7dp"
+                        android:src="@drawable/image_load"
+                        app:civ_border_color="#653B3B"
+                        app:civ_border_width="1dp" />
+                    <!--#653B3B-->
+                    <ImageView
+                        android:id="@+id/img_cycle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/vong6" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/txt_name_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/imgAvatar"
+                    android:fontFamily="@font/vivaldi"
+                    android:gravity="center"
+                    android:text="Tran Hung Danh"
+                    android:textColor="@android:color/background_dark"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/ic_file_download"
+                    app:borderWidth="0dp"
+                    app:fabSize="normal"
+                    app:rippleColor="#20CC13" />
+
+
+                <com.wang.avi.AVLoadingIndicatorView
+                    android:id="@+id/avi"
+                    style="@style/AVLoadingIndicatorView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="visible"
+                    app:indicatorColor="@android:color/background_dark"
+                    app:indicatorName="BallPulseIndicator" />
+
+                <TextView
+                    android:id="@+id/txt_name_song"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:fontFamily="@font/vivaldi"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:text="@string/name_song_wecome"
+                    android:textColor="@android:color/background_dark"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txt_name_singer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txt_name_song"
+                    android:layout_centerHorizontal="true"
+                    android:fontFamily="@font/vivaldi"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:text="@string/app_name"
+                    android:textColor="@android:color/background_dark"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+
+            <LinearLayout
+                android:id="@+id/layout_anim"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/black_overlay">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.7">
+
+                    <ImageView
+                        android:id="@+id/img_anim"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_start_anim" />
+
+                    <Switch
+                        android:id="@+id/swState"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:layout_weight="3"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/img_baseline"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginBottom="3dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/music_cancel_online" />
+
+                    <ImageView
+                        android:id="@+id/img_play_stop"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_play" />
+
+                    <ImageView
+                        android:id="@+id/img_reload"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_fast_forward" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_animation_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <!--<com.danhtran12797.thd.app_music2019.Activity.StarAnimationView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent" />-->
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fullscreen_content_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/black_overlay"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <ImageView
+                    android:id="@+id/img_home_online"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_home_online" />
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></Spinner>
+
+                <ImageView
+                    android:id="@+id/img_account"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_person" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

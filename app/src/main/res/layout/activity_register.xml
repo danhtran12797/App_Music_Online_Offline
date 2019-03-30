@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/custom_background_activity_load"
+    tools:context="com.danhtran12797.thd.app_music2019.Activity.RegisterActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foreground="@drawable/alpha_background_black"></RelativeLayout>
+
+    <ImageView
+        android:id="@+id/img_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo_music"
+        android:translationY="200dp" />
+
+    <com.victor.loading.rotate.RotateLoading
+        android:id="@+id/rotateloading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="0dp"
+        app:loading_color="@android:color/holo_blue_light"
+        app:loading_width="5dp" />
+
+    <LinearLayout
+        android:id="@+id/container_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:translationY="300dp">
+
+        <EditText
+            android:id="@+id/txtReg_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/white"
+            android:textColorHint="#c5c5c5" />
+
+        <EditText
+            android:id="@+id/txtReg_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="Mật khẩu"
+            android:inputType="textPassword"
+            android:textColor="@android:color/white"
+            android:textColorHint="#c5c5c5" />
+
+        <EditText
+            android:id="@+id/txtReg_conf_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="Xác nhận mật khẩu"
+            android:inputType="textPassword"
+            android:textColor="@android:color/white"
+            android:textColorHint="#c5c5c5" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/selector_button_songs"
+            android:text="đăng ký"
+            android:textColor="@android:color/white"
+            android:textSize="24dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtLogin_now"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_res_from_login"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="@string/login_now"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</RelativeLayout>

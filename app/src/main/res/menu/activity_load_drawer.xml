@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/danh"
+            android:title="Nhà của tôi"
+            android:icon="@drawable/ic_home"
+            android:checked="true"/>
+    </group>
+
+    <item android:id="@+id/menu_account"
+        android:title="Tài khoản của tôi"
+        android:icon="@drawable/ic_account_circle"/>
+
+    <item android:id="@+id/menu_infor_app"
+        android:title="Thông tin ứng dụng"
+        android:icon="@drawable/ic_music"/>
+
+    <item android:id="@+id/menu_logout_app"
+        android:title="Đăng xuất"
+        android:icon="@drawable/ic_power"/>
+
+    <item android:id="@+id/menu_exit_app"
+        android:title="Thoát"
+        android:icon="@drawable/ic_exit_to_app"/>
+</menu>

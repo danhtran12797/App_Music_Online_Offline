@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "924460425201",
+    "firebase_url": "https://appmusicfrist.firebaseio.com",
+    "project_id": "appmusicfrist",
+    "storage_bucket": "appmusicfrist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924460425201:android:b17715d81f35a721",
+        "android_client_info": {
+          "package_name": "com.example.mypc.viewpagerfrist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924460425201-59ame3qf4j4k01v0vt8ceftdp1b9g6dm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mypc.viewpagerfrist",
+            "certificate_hash": "cd561ca7f2d495a4053f92f9a4a34f7c28e1e352"
+          }
+        },
+        {
+          "client_id": "924460425201-r5kdutpgbri1dts9rj7o6kki0r2q25ko.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPViJYPttSBSg9I7CCt66AMy6JMdqtzec"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "924460425201-r5kdutpgbri1dts9rj7o6kki0r2q25ko.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

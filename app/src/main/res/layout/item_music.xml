@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_item"
+    android:foreground="?selectableItemBackground"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/txtNameSong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="Anh chang sao ma"
+        android:textColor="#fff"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/imgLocal"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txtNameSong"
+        android:src="@mipmap/ic_launcher_round" />
+
+    <TextView
+        android:id="@+id/txtSinger"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtNameSong"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/imgLocal"
+        android:singleLine="true"
+        android:text="Huong Tram"
+        android:textColor="@android:color/darker_gray" />
+
+</RelativeLayout>
