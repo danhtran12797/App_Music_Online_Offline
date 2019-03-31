@@ -25,6 +25,8 @@
     <string name="developer_by">Thực hiện bởi: <a href="https://www.facebook.com/danhtran12797"><b>danhtran12797</b></a> </string>
     <string name="contact_me_app">Email: <b>danhtran12797@gmail.com</b></string>
 
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
     <string-array name="arr_cycle">
         <item>vong2</item>
         <item>vong3</item>

@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:924460425201:android:b17715d81f35a721",
+        "mobilesdk_app_id": "1:924460425201:android:6fa2d60b3c9864c7",
         "android_client_info": {
-          "package_name": "com.example.mypc.viewpagerfrist"
+          "package_name": "com.danhtran12797.thd.app_music2019"
         }
       },
       "oauth_client": [
         {
-          "client_id": "924460425201-59ame3qf4j4k01v0vt8ceftdp1b9g6dm.apps.googleusercontent.com",
+          "client_id": "924460425201-pbib3s9lga9c63hld2rp9kkr2ira8v7b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.mypc.viewpagerfrist",
-            "certificate_hash": "cd561ca7f2d495a4053f92f9a4a34f7c28e1e352"
+            "package_name": "com.danhtran12797.thd.app_music2019",
+            "certificate_hash": "f20eadb14df4d1f7a90c6924a997029d10d479c0"
           }
         },
         {

@@ -31,7 +31,6 @@ public class DiscFragment extends Fragment {
     private RelativeLayout relativeLayout;
     public static ObjectAnimator objectAnimator;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

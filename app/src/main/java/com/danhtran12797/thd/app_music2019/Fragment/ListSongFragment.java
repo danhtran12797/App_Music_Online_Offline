@@ -28,11 +28,13 @@ public class ListSongFragment extends Fragment {
     private static final String ARG_ARR_MUSIC = "MUSICS";
 
     View view;
-    private RecyclerView recyclerView;
+    public static RecyclerView recyclerView;
     private ArrayList<Music> arrMusics;
     public static MusicAdapter musicAdapter;
     private RelativeLayout relativeLayout;
     public static FragmentContactListener listener;
+
+
 
     public interface FragmentContactListener {
         void onInpuSent(int position);
@@ -64,6 +66,7 @@ public class ListSongFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(musicAdapter);
         recyclerView.setHasFixedSize(true);
+
 
         DividerItemDecoration dividerItemDecorationvider = new DividerItemDecoration(getContext(), new LinearLayoutManager(getContext()).getOrientation());
         Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.custom_divider);

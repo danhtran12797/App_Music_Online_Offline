@@ -1,7 +1,9 @@
 package com.danhtran12797.thd.app_music2019.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +25,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     private ArrayList<Music> arrMusic;
     private ArrayList<Music> arrMusicFull;
     private Context context;
+    public int selectedPosition=-1;
+
+    public void setPosition(int position){
+        selectedPosition=position;
+        notifyDataSetChanged();
+    }
 
     private OnItemClickListener mListener;
 
@@ -48,7 +56,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MusicAdapter.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final MusicAdapter.ViewHolder viewHolder, final int i) {
         final Music music = arrMusic.get(i);
         viewHolder.txtNameSong.setText(music.getNameSong());
         viewHolder.txtNameSinger.setText(music.getNameSinger());
@@ -57,6 +65,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         } else {
             viewHolder.imgLocal.setImageResource(R.drawable.ic_arrow);
         }
+
+        if(selectedPosition==i)
+            viewHolder.itemView.setBackgroundColor(Color.parseColor("#AD383838"));
+        else
+            viewHolder.itemView.setBackgroundColor(Color.parseColor("#00ffffff"));
+
     }
 
     @Override

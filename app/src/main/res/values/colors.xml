@@ -5,7 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="color_item_music">#292929</color>
     <color name="color_item_music1">#00ffffff</color>
-    <color name="color_pressed_item_music">#834100</color>
+    <color name="color_pressed_item_music">#BC333333</color>
     <color name="color_favorites">#b41fff</color>
     <color name="color_playlist">#933f03</color>
 

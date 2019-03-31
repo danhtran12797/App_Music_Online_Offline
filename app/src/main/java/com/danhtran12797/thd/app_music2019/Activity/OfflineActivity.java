@@ -62,6 +62,7 @@ import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.arrPlayl
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.arrSong;
 import static com.danhtran12797.thd.app_music2019.Fragment.DiscFragment.objectAnimator;
 import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.musicAdapter;
+import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.recyclerView;
 import static com.thekhaeng.pushdownanim.PushDownAnim.MODE_SCALE;
 
 
@@ -636,6 +637,9 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             }
         });
 
+        musicAdapter.setPosition(position);
+        recyclerView.scrollToPosition(position);
+
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
 
@@ -752,10 +756,12 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     public void delete_arrMusic_local(int position) {
         Music song_delete = arrSong.get(position);
         arrSong.remove(position);
-        if (arrFav.contains(song_delete))
-            arrFav.remove(position);
+        if (arrFav.contains(song_delete)){
+            Log.d("LLL","Why");
+            arrFav.remove(song_delete);
+        }
         if (arrPlaylist.contains(song_delete))
-            arrPlaylist.remove(position);
+            arrPlaylist.remove(song_delete);
     }
 
     @Override
