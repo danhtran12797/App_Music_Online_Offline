@@ -399,11 +399,13 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     if (mediaPlayer.isPlaying()) {
                         Log.d("FFF", "isPlaying");
                         objectAnimator.pause();
+                        musicAdapter.setCheckPause(true); // pause VuMeterView (heart)
                         btnPlay.setImageResource(R.drawable.ic_play);
                         mediaPlayer.pause();
                     } else {
                         Log.d("FFF", "else");
                         objectAnimator.resume();
+                        musicAdapter.setCheckPause(false); // pause VuMeterView (heart)
                         btnPlay.setImageResource(R.drawable.ic_pause);
                         mediaPlayer.start();
                     }
@@ -675,7 +677,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                 BufferedReader br = new BufferedReader(new FileReader(file_lyric_zing));
                 String line;
                 while ((line = br.readLine()) != null) {
-                    if (line.charAt(1) != '0')
+                    if (line.length()==0||line.charAt(1) != '0')
                         continue;
                     arrLyric.add(line.substring(10));
                 }

@@ -20,15 +20,23 @@ import com.danhtran12797.thd.app_music2019.R;
 
 import java.util.ArrayList;
 
+import io.gresse.hugo.vumeterlibrary.VuMeterView;
+
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> implements Filterable {
 
     private ArrayList<Music> arrMusic;
     private ArrayList<Music> arrMusicFull;
     private Context context;
-    public int selectedPosition=-1;
+    public int selectedPosition = -1;
+    public boolean checkPause = false;
 
-    public void setPosition(int position){
-        selectedPosition=position;
+    public void setPosition(int position) {
+        selectedPosition = position;
+        notifyDataSetChanged();
+    }
+
+    public void setCheckPause(boolean check) {
+        checkPause = check;
         notifyDataSetChanged();
     }
 
@@ -66,10 +74,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             viewHolder.imgLocal.setImageResource(R.drawable.ic_arrow);
         }
 
-        if(selectedPosition==i)
+        if (selectedPosition == i) {
+            viewHolder.mVuMeterView.setVisibility(View.VISIBLE);
+            viewHolder.mVuMeterView.resume(true);
             viewHolder.itemView.setBackgroundColor(Color.parseColor("#AD383838"));
-        else
+            if (checkPause) {
+                viewHolder.mVuMeterView.pause();
+            }
+        } else {
+            viewHolder.mVuMeterView.setVisibility(View.GONE);
+            viewHolder.mVuMeterView.stop(true);
             viewHolder.itemView.setBackgroundColor(Color.parseColor("#00ffffff"));
+        }
+
 
     }
 
@@ -83,6 +100,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         TextView txtNameSinger;
         ImageView imgLocal;
         RelativeLayout layout;
+        VuMeterView mVuMeterView;
 
         public ViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -90,6 +108,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             txtNameSinger = itemView.findViewById(R.id.txtSinger);
             imgLocal = itemView.findViewById(R.id.imgLocal);
             layout = itemView.findViewById(R.id.layout_item);
+            mVuMeterView = itemView.findViewById(R.id.vumeter);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

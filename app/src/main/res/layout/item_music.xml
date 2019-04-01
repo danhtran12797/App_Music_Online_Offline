@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:vumeter="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,10 +9,23 @@
 
     <!--android:background="@drawable/selector_item"-->
 
+    <io.gresse.hugo.vumeterlibrary.VuMeterView
+        android:id="@+id/vumeter"
+        android:layout_width="25dp"
+        android:layout_height="20dp"
+        vumeter:vumeter_stopSize="5dp"
+        vumeter:vumeter_speed="4"
+        vumeter:vumeter_blockNumber="4"
+        vumeter:vumeter_blockSpacing="2dp"
+        vumeter:vumeter_backgroundColor="#33b5e5"
+        vumeter:vumeter_startOff="true"/>
+
     <TextView
         android:id="@+id/txtNameSong"
+        android:layout_toRightOf="@+id/vumeter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:singleLine="true"
         android:text="Anh chang sao ma"
         android:textColor="#fff"
@@ -30,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtNameSong"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/imgLocal"
         android:singleLine="true"
         android:text="Huong Tram"

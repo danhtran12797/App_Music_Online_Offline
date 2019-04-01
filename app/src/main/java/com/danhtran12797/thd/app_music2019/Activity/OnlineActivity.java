@@ -30,6 +30,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -38,6 +39,7 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -65,11 +67,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.gresse.hugo.vumeterlibrary.VuMeterView;
 import libs.mjn.prettydialog.PrettyDialog;
 import libs.mjn.prettydialog.PrettyDialogCallback;
 
@@ -218,12 +222,16 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     private Intent intent;
 
     String name_path_song;
-    private boolean check_download = false;
 
     AudioManager audioManager;
 
     private ProgressDialog pDialog;
     public static final int progress_bar_type = 0;
+
+    private SeekBar seekBar;
+    private boolean check_onBackPressed = false;
+    private VuMeterView mVuMeterView;
+    Switch switch_sk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,6 +242,37 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
         setContentView(R.layout.activity_online);
 
+        switch_sk=findViewById(R.id.switch_sk);
+        mVuMeterView=findViewById(R.id.vumeter_on);
+        seekBar=findViewById(R.id.seekBar_on);
+
+        switch_sk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    show_seekbar();
+                }else{
+                    hide_seekbar();
+                }
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (!check_onBackPressed)
+                    mediaPlayer.seekTo(seekBar.getProgress());
+            }
+        });
 
         layout = findViewById(R.id.frame_layout);
 
@@ -439,6 +478,42 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                     .into(imgAvatar);
             txt_name_user.setText(name_user);
         }
+    }
+
+    public void show_seekbar(){
+        seekBar.setVisibility(View.VISIBLE);
+        mVuMeterView.setVisibility(View.VISIBLE);
+        //mVuMeterView.stop(true);
+    }
+
+    public void hide_seekbar(){
+        seekBar.setVisibility(View.GONE);
+        mVuMeterView.setVisibility(View.GONE);
+    }
+
+    public void updateTimeSong() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (check_onBackPressed) {
+                    handler.removeCallbacks(this);//dừng handler
+                    stopPlayer();
+                } else {
+                    //seekBar.setThumb(getThumb(mediaPlayer.getCurrentPosition())); //thiết lập Thumb cho seekbar
+                    //txtTimeSong.setText(format.format(mediaPlayer.getCurrentPosition()));
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                    handler.postDelayed(this, 500);
+                }
+            }
+        }, 100);
+    }
+
+    public void setTimeTotal() {
+        //SimpleDateFormat format_time=new SimpleDateFormat("mm:ss");
+        //txtTimeTotal.setText(format_time.format(mediaPlayer.getDuration()));
+        //timeTotal = format.format(mediaPlayer.getDuration());
+        seekBar.setMax(mediaPlayer.getDuration());
     }
 
     public class DownloadLyricFromURL extends AsyncTask<MusicOn, Void, Void> {
@@ -824,6 +899,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     public boolean asyn_load_music(String url) {
         if (!isOnline() || arrMusicVN.size() == 0 || arrMusicAu.size() == 0 || arrMusicA.size() == 0) {
             Log.d("RRR", " come on danh");
+            check_onBackPressed=true;
             return false;
         }
 
@@ -850,6 +926,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 new AsynTask_Start_MusicOn().execute();
             }
         });
@@ -865,6 +946,8 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
             Log.d("DDD", "Start playback");
         }
+
+
 
         return true;
     }
@@ -957,6 +1040,10 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 }
                 break;
             case R.id.img_baseline:
+                check_onBackPressed=true;
+                seekBar.setProgress(0);
+                mVuMeterView.stop(true);
+
                 check_play_stop = 0;
                 img_play_music.setImageResource(R.drawable.ic_play);
                 stopPlayer();
@@ -965,12 +1052,15 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.img_play_stop:
                 if (check_play_stop == 0) {
+                    //mVuMeterView.resume(true);
                     new AsynTask_Start_MusicOn().execute();
                 } else if (check_play_stop == 1) {
+                    mVuMeterView.pause();
                     pausePlayer();
                     img_play_music.setImageResource(R.drawable.ic_play);
                     check_play_stop = 2;
                 } else {
+                    mVuMeterView.resume(true);
                     mediaPlayer.start();
                     img_play_music.setImageResource(R.drawable.ic_pause);
                     check_play_stop = 1;
@@ -1000,6 +1090,8 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        audioManager.abandonAudioFocus(this);
+        check_onBackPressed = true;
         stopPlayer();
         Log.d("TTT", "onDestroy");
     }
@@ -1022,6 +1114,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+
             stopAnim();
             Random_cycle();
             Random_background();
@@ -1035,6 +1128,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 txt_name_song.setText(getString(R.string.name_song_wecome));
                 txt_name_singer.setText(getString(R.string.app_name));
             } else {
+                mVuMeterView.resume(true);
+                //show_seekbar();
+                check_onBackPressed=false;
+                setTimeTotal();
+                updateTimeSong();
                 if (mSwitch.isChecked()) {
                     if (check_anim)
                         Random_animaton_view();
@@ -1106,6 +1204,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
                 check_play_stop = 0;
                 img_play_music.setImageResource(R.drawable.ic_play);
+                check_onBackPressed = true;
                 stopPlayer();
                 txt_name_song.setText(getString(R.string.name_song_wecome));
                 txt_name_singer.setText(getString(R.string.app_name));

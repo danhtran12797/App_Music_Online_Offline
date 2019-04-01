@@ -390,15 +390,15 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
                     cursor.moveToNext();
                     if (path != null && path.endsWith(".mp3")) {
-                        boolean local = true;
+                        //boolean local = true;
 
-                        File file = new File(path);
-                        if (file.getParentFile().getName().equals("THD Music")) {
-                            Log.d("OOO", "come on come on");
-                            local = false;
-                            String name = file.getName();
-                            id = name.substring(name.lastIndexOf("_") + 1, name.indexOf("."));
-                        }
+//                        File file = new File(path);
+//                        if (file.getParentFile().getName().equals("THD Music")) {
+//                            Log.d("OOO", "come on come on");
+//                            local = false;
+//                            String name = file.getName();
+//                            id = name.substring(name.lastIndexOf("_") + 1, name.indexOf("."));
+//                        }
 
                         boolean check_fav = false;
                         boolean check_playlist = false;
@@ -408,7 +408,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                         if (arrID_Playlist.contains(id))
                             check_playlist = true;
 
-                        mp3Files.add(new Music(nameSong, nameSinger, local, path, id, check_fav, check_playlist));
+                        mp3Files.add(new Music(nameSong, nameSinger, true, path, id, check_fav, check_playlist));
                     }
                 }
             }
@@ -449,6 +449,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                     if (arrID_Playlist.contains(id))
                         check_playlist = true;
 
+                    //fileList.add(new Music(arr[0], arr[1], false, file.getPath(), id, check_fav, check_playlist));
                     fileList.add(new Music(arr[0], arr[1], false, file.getPath(), id, check_fav, check_playlist));
                 }
             }
