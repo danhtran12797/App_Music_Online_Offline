@@ -62,7 +62,6 @@ public class DiscFragment extends Fragment {
     }
 
     public static void CreateMusic(int position, String disc) {
-
         Music music = OfflineActivity.arrMusic.get(position);
 
         String path = music.getPath();
@@ -73,19 +72,21 @@ public class DiscFragment extends Fragment {
 
         byte[] data = mmr.getEmbeddedPicture();
         if (data != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            imgAvatarSong.setImageBitmap(bitmap);
+            Bitmap bitmap_disc = BitmapFactory.decodeByteArray(data, 0, data.length);
+            imgAvatarSong.setImageBitmap(bitmap_disc);
 
         } else {
-            if (disc.equals("songs"))
+            if (disc.equals("songs")){
                 imgAvatarSong.setImageResource(R.drawable.disc_song);
-            else if (disc.equals("playlists"))
+            }
+            else if (disc.equals("playlists")){
                 imgAvatarSong.setImageResource(R.drawable.disc_playlist);
-            else
+            }
+            else{
                 imgAvatarSong.setImageResource(R.drawable.disc_favorite);
+            }
         }
 
         mmr.release();
     }
-
 }

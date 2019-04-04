@@ -10,7 +10,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -23,7 +23,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
@@ -35,9 +34,6 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -247,8 +243,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
     private void animate() {
         ViewGroup container = findViewById(R.id.layout_off);
-
-
 //        ViewCompat.animate(logoImageView)
 //                .translationY(-200)
 //                .setStartDelay(STARTUP_DELAY)
@@ -258,7 +252,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         for (int i = 0; i < container.getChildCount(); i++) {
             View v = container.getChildAt(i);
             ViewPropertyAnimatorCompat viewAnimator;
-
 //            if (!(v instanceof Button)) {
 //                viewAnimator = ViewCompat.animate(v)
 //                        .translationY(50).alpha(1)
@@ -277,10 +270,8 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                         .setStartDelay((ITEM_DELAY * i) + 500)
                         .setDuration(500);
                 viewAnimator.setInterpolator(new DecelerateInterpolator()).start();
-
             }
         }
-
     }
 
     public void display_user(DocumentSnapshot document, String mail_user) {
@@ -390,25 +381,17 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
                     cursor.moveToNext();
                     if (path != null && path.endsWith(".mp3")) {
-                        //boolean local = true;
+                        if(!new File(path).getParentFile().getName().equals("THD Music")){
+                            boolean check_fav = false;
+                            boolean check_playlist = false;
 
-//                        File file = new File(path);
-//                        if (file.getParentFile().getName().equals("THD Music")) {
-//                            Log.d("OOO", "come on come on");
-//                            local = false;
-//                            String name = file.getName();
-//                            id = name.substring(name.lastIndexOf("_") + 1, name.indexOf("."));
-//                        }
+                            if (arrID_Fav.contains(id))
+                                check_fav = true;
+                            if (arrID_Playlist.contains(id))
+                                check_playlist = true;
 
-                        boolean check_fav = false;
-                        boolean check_playlist = false;
-
-                        if (arrID_Fav.contains(id))
-                            check_fav = true;
-                        if (arrID_Playlist.contains(id))
-                            check_playlist = true;
-
-                        mp3Files.add(new Music(nameSong, nameSinger, true, path, id, check_fav, check_playlist));
+                            mp3Files.add(new Music(nameSong, nameSinger, true, path, id, check_fav, check_playlist));
+                        }
                     }
                 }
             }
@@ -449,7 +432,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                     if (arrID_Playlist.contains(id))
                         check_playlist = true;
 
-                    //fileList.add(new Music(arr[0], arr[1], false, file.getPath(), id, check_fav, check_playlist));
                     fileList.add(new Music(arr[0], arr[1], false, file.getPath(), id, check_fav, check_playlist));
                 }
             }

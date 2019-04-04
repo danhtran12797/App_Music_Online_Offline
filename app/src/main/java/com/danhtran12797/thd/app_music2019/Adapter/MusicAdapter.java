@@ -1,8 +1,6 @@
 package com.danhtran12797.thd.app_music2019.Adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +12,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danhtran12797.thd.app_music2019.Model.Music;
 import com.danhtran12797.thd.app_music2019.R;
@@ -30,6 +29,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     public int selectedPosition = -1;
     public boolean checkPause = false;
 
+    private OnItemClickListener mListener;
+    private OnClickMenuSongBottomSheet listener_bs;
+
+
+    public interface OnClickMenuSongBottomSheet{
+        void show_bottom_sheet(int position);
+    }
+
     public void setPosition(int position) {
         selectedPosition = position;
         notifyDataSetChanged();
@@ -40,7 +47,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -50,10 +56,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         mListener = listener;
     }
 
-    public MusicAdapter(ArrayList<Music> arrMusic, Context context) {
+    public MusicAdapter(ArrayList<Music> arrMusic, Context context, OnClickMenuSongBottomSheet listener_bs) {
         this.arrMusic = arrMusic;
         arrMusicFull = new ArrayList<>(arrMusic);
         this.context = context;
+        this.listener_bs= listener_bs;
     }
 
     @NonNull
@@ -86,8 +93,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             viewHolder.mVuMeterView.stop(true);
             viewHolder.itemView.setBackgroundColor(Color.parseColor("#00ffffff"));
         }
-
-
     }
 
     @Override
@@ -101,6 +106,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         ImageView imgLocal;
         RelativeLayout layout;
         VuMeterView mVuMeterView;
+        ImageView menu_song;
 
         public ViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -109,6 +115,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             imgLocal = itemView.findViewById(R.id.imgLocal);
             layout = itemView.findViewById(R.id.layout_item);
             mVuMeterView = itemView.findViewById(R.id.vumeter);
+            menu_song=itemView.findViewById(R.id.menu_song);
+
+            menu_song.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener_bs.show_bottom_sheet(getAdapterPosition());
+                }
+            });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

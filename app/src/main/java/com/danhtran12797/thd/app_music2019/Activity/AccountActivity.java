@@ -117,7 +117,7 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
                                 .into(img_profile);
                     } else {
                         check_document = false;
-                        showDialog(user.getEmail(), "Bạn cần nhập tên và có thể click vào 'con mèo' để chọn ảnh đại diện. Sau đó click SAVE",R.color.pdlg_color_green);
+                        showDialog(user.getEmail(), "Bạn cần nhập tên và có thể click vào 'con mèo' để chọn ảnh đại diện. Sau đó click SAVE", R.color.pdlg_color_green);
                     }
                 } else {
                     Toast.makeText(AccountActivity.this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -135,7 +135,7 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
                 img_profile.setImageURI(mainImageURI);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
-                Log.d("DDD",error.getMessage());
+                Log.d("DDD", error.getMessage());
             }
         }
     }
@@ -202,14 +202,14 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
                 final String user_id = mAuth.getCurrentUser().getUid();
                 final StorageReference image_path = mStorageRef.child("profile_image").child(user_id + ".png");
 
-                if(mainImageURI!=null){ // user có chọn ảnh
-                    File file=new File(mainImageURI.getPath());
+                if (mainImageURI != null) { // user có chọn ảnh
+                    File file = new File(mainImageURI.getPath());
                     try {
                         compressedImageFile = new Compressor(this).compressToBitmap(file);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }else{ //user k chọn ảnh
+                } else { //user k chọn ảnh
                     img_profile.setDrawingCacheEnabled(true);
                     img_profile.buildDrawingCache();
                     compressedImageFile = ((BitmapDrawable) img_profile.getDrawable()).getBitmap();
@@ -282,7 +282,6 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
         } else {
             txt_profile_name.setError(null);
         }
-
         return valid;
     }
 

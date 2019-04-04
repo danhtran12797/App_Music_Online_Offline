@@ -4,28 +4,36 @@
     android:id="@+id/layout_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/background_logo"
     android:foreground="?selectableItemBackground"
     android:padding="5dp">
 
-    <!--android:background="@drawable/selector_item"-->
+    <ImageView
+        android:id="@+id/menu_song"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_more_vert"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
 
     <io.gresse.hugo.vumeterlibrary.VuMeterView
         android:id="@+id/vumeter"
         android:layout_width="25dp"
         android:layout_height="20dp"
-        vumeter:vumeter_stopSize="5dp"
-        vumeter:vumeter_speed="4"
+        vumeter:vumeter_backgroundColor="#33b5e5"
         vumeter:vumeter_blockNumber="4"
         vumeter:vumeter_blockSpacing="2dp"
-        vumeter:vumeter_backgroundColor="#33b5e5"
-        vumeter:vumeter_startOff="true"/>
+        vumeter:vumeter_speed="4"
+        vumeter:vumeter_startOff="true"
+        vumeter:vumeter_stopSize="5dp" />
 
     <TextView
         android:id="@+id/txtNameSong"
-        android:layout_toRightOf="@+id/vumeter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/vumeter"
         android:singleLine="true"
         android:text="Anh chang sao ma"
         android:textColor="#fff"

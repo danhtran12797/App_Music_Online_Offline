@@ -30,7 +30,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -67,7 +66,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -242,16 +240,18 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
         setContentView(R.layout.activity_online);
 
-        switch_sk=findViewById(R.id.switch_sk);
-        mVuMeterView=findViewById(R.id.vumeter_on);
-        seekBar=findViewById(R.id.seekBar_on);
+        mediaPlayer = new MediaPlayer();
+
+        switch_sk = findViewById(R.id.switch_sk);
+        mVuMeterView = findViewById(R.id.vumeter_on);
+        seekBar = findViewById(R.id.seekBar_on);
 
         switch_sk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     show_seekbar();
-                }else{
+                } else {
                     hide_seekbar();
                 }
             }
@@ -480,15 +480,16 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    public void show_seekbar(){
+    public void show_seekbar() {
         seekBar.setVisibility(View.VISIBLE);
         mVuMeterView.setVisibility(View.VISIBLE);
-        //mVuMeterView.stop(true);
+        //mVuMeterView.resume(true);
     }
 
-    public void hide_seekbar(){
+    public void hide_seekbar() {
         seekBar.setVisibility(View.GONE);
         mVuMeterView.setVisibility(View.GONE);
+        //mVuMeterView.stop(true);
     }
 
     public void updateTimeSong() {
@@ -500,8 +501,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                     handler.removeCallbacks(this);//dừng handler
                     stopPlayer();
                 } else {
-                    //seekBar.setThumb(getThumb(mediaPlayer.getCurrentPosition())); //thiết lập Thumb cho seekbar
-                    //txtTimeSong.setText(format.format(mediaPlayer.getCurrentPosition()));
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     handler.postDelayed(this, 500);
                 }
@@ -510,9 +509,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     }
 
     public void setTimeTotal() {
-        //SimpleDateFormat format_time=new SimpleDateFormat("mm:ss");
-        //txtTimeTotal.setText(format_time.format(mediaPlayer.getDuration()));
-        //timeTotal = format.format(mediaPlayer.getDuration());
         seekBar.setMax(mediaPlayer.getDuration());
     }
 
@@ -540,7 +536,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                         + "/THD Music/lyric/" + song_downs[0].getId());
 
                 byte data[] = new byte[1024];
-
 
                 while ((count = input.read(data)) != -1) {
                     // publishing the progress....
@@ -677,7 +672,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
     }
 
-
     public boolean checkPermissionForWriteExtertalStorage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int result = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -687,23 +681,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    public void show_anim_download() {
-        //fabProgressCircle.show(); // chạy anim fabProgress
-
-        img_off_music.setEnabled(false);
-        img_play_music.setEnabled(false);
-        img_random_music.setEnabled(false);
-        fab.setEnabled(false);
-    }
-
-    public void hide_anim_download() {
-        //fabProgressCircle.hide(); // chạy anim fabProgress
-
-        img_off_music.setEnabled(true);
-        img_play_music.setEnabled(true);
-        img_random_music.setEnabled(true);
-        fab.setEnabled(true);
-    }
 
     public void startDownload(final MusicOn song) {
         if (song == null) {
@@ -730,9 +707,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             dir_lyric.mkdirs(); // creates dirs lyric
         }
 
-        //name_path_song=song.getName_song()+"_THD_Music_"+song.getId()+".mp3"; // đường dẫn bài hát
         name_path_song = song.getName_song() + "_" + song.getName_author() + "_-" + song.getId() + ".mp3"; // đường dẫn bài hát
-        Log.d("OOO", name_path_song);
 
         final File file_song_download = new File(Environment.getExternalStorageDirectory() + "/THD Music", name_path_song);
 
@@ -764,24 +739,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-//    public void download(MusicOn musicOn){
-//        check_download=true;
-//
-//        show_anim_download(); // show anim fabProgressCircle,...
-//
-//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(musicOn.getSong_url()));
-//        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
-//                DownloadManager.Request.NETWORK_MOBILE);
-//        request.setTitle(musicOn.getName_song());
-//        request.setDescription("THD Music");
-//
-//        request.allowScanningByMediaScanner();
-//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-//        request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory()+"/THD Music",  musicOn.getName_song()+"_THD_Music_"+musicOn.getId()+".mp3");
-//        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-//        manager.enqueue(request);
-//
-//    }
 
     @Override
     protected void onStop() {
@@ -899,7 +856,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     public boolean asyn_load_music(String url) {
         if (!isOnline() || arrMusicVN.size() == 0 || arrMusicAu.size() == 0 || arrMusicA.size() == 0) {
             Log.d("RRR", " come on danh");
-            check_onBackPressed=true;
+            check_onBackPressed = true;
             return false;
         }
 
@@ -946,7 +903,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
             Log.d("DDD", "Start playback");
         }
-
 
 
         return true;
@@ -1040,7 +996,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 }
                 break;
             case R.id.img_baseline:
-                check_onBackPressed=true;
+                check_onBackPressed = true;
                 seekBar.setProgress(0);
                 mVuMeterView.stop(true);
 
@@ -1052,7 +1008,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.img_play_stop:
                 if (check_play_stop == 0) {
-                    //mVuMeterView.resume(true);
                     new AsynTask_Start_MusicOn().execute();
                 } else if (check_play_stop == 1) {
                     mVuMeterView.pause();
@@ -1070,7 +1025,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 new AsynTask_Start_MusicOn().execute();
                 break;
             case R.id.img_account:
-                //fabProgressCircle.beginFinalAnimation();
                 intent = new Intent(this, AccountActivity.class);
                 startActivity(intent);
                 finish();
@@ -1103,6 +1057,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         protected void onPreExecute() {
             super.onPreExecute();
 
+            mVuMeterView.stop(false);
             startAnim();
             get_url_music();
         }
@@ -1116,8 +1071,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             super.onPostExecute(aBoolean);
 
             stopAnim();
-            Random_cycle();
-            Random_background();
+
             img_play_music.setImageResource(R.drawable.ic_pause);
             if (aBoolean.equals(false)) {
                 showDialog("THD Music", "Vui lòng kiểm tra Internet", R.color.pdlg_color_blue);
@@ -1128,9 +1082,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 txt_name_song.setText(getString(R.string.name_song_wecome));
                 txt_name_singer.setText(getString(R.string.app_name));
             } else {
+                Random_cycle();
+                Random_background();
                 mVuMeterView.resume(true);
                 //show_seekbar();
-                check_onBackPressed=false;
+                check_onBackPressed = false;
                 setTimeTotal();
                 updateTimeSong();
                 if (mSwitch.isChecked()) {

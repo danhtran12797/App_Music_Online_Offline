@@ -486,6 +486,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Yêu Thích", Toast.LENGTH_SHORT).show();
                     if (KEY_LIST_SONG.equals("playlists")) {
                         arrSong.get(getIdMusic(arrSong)).setCheck_fav(true);
+                        arrPlaylist.get(position).setCheck_fav(true);
                     } else if (KEY_LIST_SONG.equals("songs")) {
                         arrSong.get(position).setCheck_fav(true);
                     }
@@ -520,6 +521,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     arrPlaylist.add(arrMusic.get(position));
                     Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Playlist", Toast.LENGTH_SHORT).show();
                     if (KEY_LIST_SONG.equals("favorites")) {
+                        arrFav.get(position).setCheck_playlist(true);
                         arrSong.get(getIdMusic(arrSong)).setCheck_playlist(true);
                     } else if (KEY_LIST_SONG.equals("songs")) {
                         arrSong.get(position).setCheck_playlist(true);
@@ -650,7 +652,6 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             // could not get audio focus.
         } else {
             mediaPlayer.start();
-
             Log.d("DDD", "Start playback");
         }
 
@@ -755,7 +756,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     }
 
     // xóa arrSong(arrSong, arrFav, arrPlaylist) gốc
-    public void delete_arrMusic_local(int position) {
+    public static void delete_arrMusic_local(int position) {
         Music song_delete = arrSong.get(position);
         arrSong.remove(position);
         if (arrFav.contains(song_delete)){

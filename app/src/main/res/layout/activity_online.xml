@@ -27,8 +27,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
-            </RelativeLayout>
+                android:layout_weight="1"></RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,26 +76,26 @@
 
                 <io.gresse.hugo.vumeterlibrary.VuMeterView
                     android:id="@+id/vumeter_on"
-                    android:alpha="0.5"
-                    android:layout_alignParentBottom="true"
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
-                    vumeter:vumeter_stopSize="5dp"
-                    vumeter:vumeter_speed="10"
+                    android:layout_alignParentBottom="true"
+                    android:alpha="0.5"
+                    vumeter:vumeter_backgroundColor="#33b5e5"
                     vumeter:vumeter_blockNumber="40"
                     vumeter:vumeter_blockSpacing="0.5dp"
-                    vumeter:vumeter_backgroundColor="#33b5e5"
-                    vumeter:vumeter_startOff="true"/>
+                    vumeter:vumeter_speed="10"
+                    vumeter:vumeter_startOff="true"
+                    vumeter:vumeter_stopSize="5dp" />
 
                 <SeekBar
                     android:id="@+id/seekBar_on"
-                    android:layout_alignParentBottom="true"
-                    android:paddingBottom="@dimen/seekbar"
-                    android:paddingTop="@dimen/seekbar"
-                    android:paddingStart="@dimen/seekbar"
                     android:layout_width="match_parent"
                     android:layout_height="12dp"
-                    android:paddingLeft="@dimen/seekbar" />
+                    android:layout_alignParentBottom="true"
+                    android:paddingStart="@dimen/seekbar"
+                    android:paddingLeft="@dimen/seekbar"
+                    android:paddingTop="@dimen/seekbar"
+                    android:paddingBottom="@dimen/seekbar" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab"
@@ -152,7 +151,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true">
-
 
             <LinearLayout
                 android:id="@+id/layout_anim"
@@ -240,10 +238,10 @@
                 <Switch
                     android:id="@+id/switch_sk"
                     android:layout_width="0dp"
-                    android:gravity="center"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:checked="true" />
+                    android:checked="true"
+                    android:gravity="center" />
 
                 <Spinner
                     android:id="@+id/spinner"
