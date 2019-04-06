@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
@@ -19,7 +20,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -57,8 +57,6 @@ import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.KEY_FAVO
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.KEY_PLAYLISTS;
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.KEY_SONGS;
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.SHARED_PREFERENCES_NAME;
-import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.arrFav;
-import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.arrPlaylist;
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.arrSong;
 import static com.danhtran12797.thd.app_music2019.Fragment.DiscFragment.objectAnimator;
 import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.musicAdapter;
@@ -66,7 +64,7 @@ import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.recy
 import static com.thekhaeng.pushdownanim.PushDownAnim.MODE_SCALE;
 
 
-public class OfflineActivity extends AppCompatActivity implements ListSongFragment.FragmentContactListener, View.OnClickListener, AudioManager.OnAudioFocusChangeListener {
+public class OfflineActivity extends AppCompatActivity implements ListSongFragment.FragmentContactListener, View.OnClickListener, AudioManager.OnAudioFocusChangeListener, ListSongFragment.AddFavPlaylistListener {
     private ViewPager viewPager;
     public ViewPagerAdapter viewPagerAdapter;
     //private TabLayout tabLayout;
@@ -94,6 +92,11 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
 
     private boolean check_frist_play_music = false;
     AudioManager audioManager;
+
+    private String id_fav = "";
+    private String id_playlist = "";
+
+    private boolean check_change_share = false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -141,6 +144,9 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // intent.putExtra("arrMusic",arrMusic);
+                intent.putExtra("check_change_share", check_change_share);
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });
@@ -167,7 +173,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             }
             Log.d("AAA", "intent");
 
-            check_fav_playlist();
+            check_fav_playlist(this.position);
         }
 
 
@@ -220,7 +226,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     }
 
     //check is fav, playlist.Then set image.
-    public void check_fav_playlist() {
+    public void check_fav_playlist(int position) {
         if (arrMusic.size() != 0) {
             Music music = arrMusic.get(position);
 
@@ -263,49 +269,39 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         return new BitmapDrawable(getResources(), bitmap);
     }
 
-    //check song is Favorite => chuỗi fav để gửi lên sharePreference
-    public String get_string_fav_id_1(ArrayList<Music> arr) {
-        String s = "";
-        if (arr.size() != 0) {
-            for (int i = 0; i < arr.size(); i++) {
-                if (arr.get(i).isCheck_fav()) {
-                    if (i == 0) {
-                        s += arr.get(i).getId();
-                    } else {
-                        s += "-" + arr.get(i).getId();
-                    }
-                }
-            }
-        }
-        return s;
-    }
-
     //check song is Playlist => chuỗi playlists để gửi lên sharePreference
-    public String get_string_playlist_id_1(ArrayList<Music> arr) {
-        String s = "";
+    public void get_string_id(ArrayList<Music> arr) {
+        //Log.d("III","arr: "+arr.size());
         if (arr.size() != 0) {
             for (int i = 0; i < arr.size(); i++) {
                 if (arr.get(i).isCheck_playlist()) {
                     if (i == 0) {
-                        s += arr.get(i).getId();
+                        id_playlist += arr.get(i).getId();
                     } else {
-                        s += "-" + arr.get(i).getId();
+                        id_playlist += "-" + arr.get(i).getId();
+                    }
+                }
+                if (arr.get(i).isCheck_fav()) {
+                    if (i == 0) {
+                        id_fav += arr.get(i).getId();
+                    } else {
+                        id_fav += "-" + arr.get(i).getId();
                     }
                 }
             }
-        }
-        return s;
-    }
 
+        }
+    }
 
     // lưu chuỗi id favorites, playlists vào sharedPreference
     public void save_preferent() {
+        get_string_id(arrSong);
 
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString(KEY_FAVORITES, get_string_fav_id_1(arrFav));
-        editor.putString(KEY_PLAYLISTS, get_string_playlist_id_1(arrPlaylist));
+        editor.putString(KEY_FAVORITES, id_fav);
+        editor.putString(KEY_PLAYLISTS, id_playlist);
 
         editor.apply();
     }
@@ -313,13 +309,17 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     @Override
     protected void onStop() {
         super.onStop();
-        save_preferent();
+        if (check_change_share)
+            save_preferent();
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        //intent.putExtra("arrMusic",arrMusic);
+        intent.putExtra("check_change_share", check_change_share);
+        setResult(RESULT_OK, intent);
 
+        super.onBackPressed();
     }
 
     @Override
@@ -478,82 +478,45 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
 
                 break;
             case R.id.imgFav:
+                check_change_share = true;
                 if (btnFav.getTag().equals(false)) {
                     btnFav.setTag(true);
                     btnFav.setImageResource(R.drawable.ic_favorite_red);
                     arrMusic.get(position).setCheck_fav(true);
-                    arrFav.add(arrMusic.get(position));
+                    arrSong.get(position).setCheck_fav(true);
                     Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Yêu Thích", Toast.LENGTH_SHORT).show();
-                    if (KEY_LIST_SONG.equals("playlists")) {
-                        arrSong.get(getIdMusic(arrSong)).setCheck_fav(true);
-                        arrPlaylist.get(position).setCheck_fav(true);
-                    } else if (KEY_LIST_SONG.equals("songs")) {
-                        arrSong.get(position).setCheck_fav(true);
-                    }
                 } else {
                     btnFav.setTag(false);
                     btnFav.setImageResource(R.drawable.ic_favorite);
                     arrMusic.get(position).setCheck_fav(false);
+                    arrSong.get(getIdMusic(this.position, arrSong)).setCheck_fav(false);
                     Toast.makeText(this, "Đã xóa '" + arrMusic.get(position).getNameSong() + "' từ Yêu Thích", Toast.LENGTH_SHORT).show();
-                    if (KEY_LIST_SONG.equals("playlists")) {
-                        arrFav.remove(getIdMusic(arrFav));
-                        arrSong.get(getIdMusic(arrSong)).setCheck_fav(false);
-                    } else if (KEY_LIST_SONG.equals("songs")) {
-                        arrSong.get(position).setCheck_fav(false);
-                        arrFav.remove(getIdMusic(arrPlaylist));
-                    } else {
-                        arrSong.get(getIdMusic(arrSong)).setCheck_fav(false);
-                        Fragment fragment = viewPagerAdapter.getItem(1);
-                        if (fragment instanceof ListSongFragment) {
-                            ((ListSongFragment) fragment).setArrMusic(position);
-                        }
-                        //arrMusic.remove(position);
-                        arrFav.remove(position);
-                        check_fav_playlist();
-                    }
                 }
+                check_fav_playlist(this.position);
                 break;
             case R.id.imgPlaylist:
+                check_change_share = true;
                 if (btnPlaylist.getTag().equals(false)) {
                     btnPlaylist.setTag(true);
                     btnPlaylist.setImageResource(R.drawable.ic_playlist_blu);
                     arrMusic.get(position).setCheck_playlist(true);
-                    arrPlaylist.add(arrMusic.get(position));
+                    arrSong.get(getIdMusic(this.position, arrSong)).setCheck_playlist(true);
                     Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Playlist", Toast.LENGTH_SHORT).show();
-                    if (KEY_LIST_SONG.equals("favorites")) {
-                        arrFav.get(position).setCheck_playlist(true);
-                        arrSong.get(getIdMusic(arrSong)).setCheck_playlist(true);
-                    } else if (KEY_LIST_SONG.equals("songs")) {
-                        arrSong.get(position).setCheck_playlist(true);
-                    }
                 } else {
                     btnPlaylist.setTag(false);
                     btnPlaylist.setImageResource(R.drawable.ic_playlist);
                     arrMusic.get(position).setCheck_playlist(false);
+                    arrSong.get(getIdMusic(this.position, arrSong)).setCheck_playlist(false);
                     Toast.makeText(this, "Đã xóa '" + arrMusic.get(position).getNameSong() + "' từ Playlist", Toast.LENGTH_SHORT).show();
-                    if (KEY_LIST_SONG.equals("favorites")) {
-                        arrPlaylist.remove(getIdMusic(arrPlaylist));
-                        arrSong.get(getIdMusic(arrSong)).setCheck_playlist(false);
-                    } else if (KEY_LIST_SONG.equals("songs")) {
-                        arrSong.get(position).setCheck_playlist(false);
-                        arrPlaylist.remove(getIdMusic(arrPlaylist));
-                    } else {
-                        arrSong.get(getIdMusic(arrSong)).setCheck_playlist(false);
-                        Fragment fragment = viewPagerAdapter.getItem(1);
-                        if (fragment instanceof ListSongFragment) {
-                            ((ListSongFragment) fragment).setArrMusic(position);
-                        }
-                        //arrMusic.remove(position);
-                        arrPlaylist.remove(position);
-                        check_fav_playlist();
-                    }
                 }
+                check_fav_playlist(this.position);
                 break;
         }
     }
 
+
     // kiểm tra arr đưa vào có trùng với id bài hát hiện tại
-    public int getIdMusic(ArrayList<Music> arr) {
+    public int getIdMusic(int position, ArrayList<Music> arr) {
         String idMusic = arrMusic.get(position).getId();
         for (int i = 0; i < arr.size(); i++) {
             if (idMusic.equals(arr.get(i).getId())) {
@@ -579,7 +542,8 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         if (btnLoop.getTag().equals(true)) {
             if (position >= arrMusic.size())
                 position = 0;
-            Log.d("FFF", "hello 3");
+            if (position < 0)
+                position = 0;
         }
 
         if (arrMusic.size() == 0) {
@@ -594,12 +558,15 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         Music music = arrMusic.get(position);
         if (!new File(music.getPath()).exists()) {
             Toast.makeText(this, "Bài hát '" + music.getNameSong() + "' đã bị xóa khỏi bộ nhớ!", Toast.LENGTH_SHORT).show();
-            arrMusic.remove(position);
+            Log.d("PPP", arrMusic.get(position).getNameSong());
             delete_arrMusic_local(position); // xóa arrSong(arrSong, arrFav, arrPlaylist) gốc
+            arrMusic.remove(position);
+
 
             Fragment fragment = viewPagerAdapter.getItem(0);
             if (fragment instanceof ListSongFragment) {
                 ((ListSongFragment) fragment).setArrMusic(position);
+                position--;
                 startPlayer();
             }
             return;
@@ -642,6 +609,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         });
 
         musicAdapter.setPosition(position);
+        musicAdapter.setCheckPause(false);
         recyclerView.scrollToPosition(position);
 
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
@@ -655,7 +623,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             Log.d("DDD", "Start playback");
         }
 
-        check_fav_playlist();
+        check_fav_playlist(this.position);
         toolbar.setTitle(music.getNameSong());
         DiscFragment.CreateMusic(position, KEY_LIST_SONG);
 
@@ -678,7 +646,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                 BufferedReader br = new BufferedReader(new FileReader(file_lyric_zing));
                 String line;
                 while ((line = br.readLine()) != null) {
-                    if (line.length()==0||line.charAt(1) != '0')
+                    if (line.length() == 0 || line.charAt(1) != '0')
                         continue;
                     arrLyric.add(line.substring(10));
                 }
@@ -757,14 +725,14 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
 
     // xóa arrSong(arrSong, arrFav, arrPlaylist) gốc
     public static void delete_arrMusic_local(int position) {
-        Music song_delete = arrSong.get(position);
-        arrSong.remove(position);
-        if (arrFav.contains(song_delete)){
-            Log.d("LLL","Why");
-            arrFav.remove(song_delete);
+        //Music song_delete = arrSong.get(position);
+        String idMusic = arrMusic.get(position).getId();
+        for (int i = 0; i < arrSong.size(); i++) {
+            if (idMusic.equals(arrSong.get(i).getId())) {
+                arrSong.remove(i);
+                break;
+            }
         }
-        if (arrPlaylist.contains(song_delete))
-            arrPlaylist.remove(song_delete);
     }
 
     @Override
@@ -811,6 +779,24 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                 // at an attenuated level
                 if (mediaPlayer.isPlaying()) mediaPlayer.setVolume(0.1f, 0.1f);
                 break;
+        }
+    }
+
+    @Override
+    public void onInpuSent1(int position, boolean fav_play) {
+        check_change_share = true;
+
+        if (fav_play) {
+            arrMusic.get(position).setCheck_playlist(true);
+            arrSong.get(getIdMusic(position, arrSong)).setCheck_playlist(true);
+            Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Playlist", Toast.LENGTH_SHORT).show();
+        } else {
+            arrMusic.get(position).setCheck_fav(true);
+            arrSong.get(getIdMusic(position, arrSong)).setCheck_fav(true);
+            Toast.makeText(this, "Đã thêm '" + arrMusic.get(position).getNameSong() + "' vào Yêu Thích", Toast.LENGTH_SHORT).show();
+        }
+        if (this.position == position) {
+            check_fav_playlist(position);
         }
     }
 }

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -53,6 +54,8 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import libs.mjn.prettydialog.PrettyDialog;
@@ -60,6 +63,8 @@ import libs.mjn.prettydialog.PrettyDialogCallback;
 
 
 public class LoadActivity extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+
+    public static int REQUEST_CODE = 1997;
 
     private Button btnFav, btnPlaylist, btnSong, btnViet, btnAuMy, btnChauA;
     private Switch mSwitch;
@@ -77,8 +82,12 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     public static final String KEY_FAVORITES = "favorites";
 
     public static ArrayList<Music> arrSong;
-    public static ArrayList<Music> arrFav;
-    public static ArrayList<Music> arrPlaylist;
+
+    private ArrayList<Music> arrFav;
+    private ArrayList<Music> arrPlaylist;
+
+//    public static ArrayList<Music> arrSong;
+//    public static ArrayList<Music> arrFav;
 
     public ArrayList<String> arrID_Fav;
     public ArrayList<String> arrID_Playlist;
@@ -237,32 +246,14 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                 }
             }
         });
-
-
     }
 
     private void animate() {
         ViewGroup container = findViewById(R.id.layout_off);
-//        ViewCompat.animate(logoImageView)
-//                .translationY(-200)
-//                .setStartDelay(STARTUP_DELAY)
-//                .setDuration(ANIM_ITEM_DURATION).setInterpolator(
-//                new DecelerateInterpolator(1.2f)).start();
 
         for (int i = 0; i < container.getChildCount(); i++) {
             View v = container.getChildAt(i);
             ViewPropertyAnimatorCompat viewAnimator;
-//            if (!(v instanceof Button)) {
-//                viewAnimator = ViewCompat.animate(v)
-//                        .translationY(50).alpha(1)
-//                        .setStartDelay((ITEM_DELAY * i) + 500)
-//                        .setDuration(1000);
-//            } else {
-//                viewAnimator = ViewCompat.animate(v)
-//                        .scaleY(1).scaleX(1)
-//                        .setStartDelay((ITEM_DELAY * i) + 500)
-//                        .setDuration(500);
-//            }
 
             if (v instanceof Button) {
                 viewAnimator = ViewCompat.animate(v)
@@ -328,6 +319,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("LLL", "onStart");
         if (!isOnline()) {
             layout_on.setVisibility(View.GONE);
             layout_off.setVisibility(View.VISIBLE);
@@ -346,11 +338,8 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onResume() {
         super.onResume();
-        if (arrFav != null && arrPlaylist != null) {
-            btnSong.setText("Bài hát(" + arrSong.size() + ")");
-            btnPlaylist.setText("Playlist(" + arrPlaylist.size() + ")");
-            btnFav.setText("Yêu thích(" + arrFav.size() + ")");
-        }
+        Log.d("LLL", "onResume");
+        btnSong.setText("Bài hát(" + arrSong.size() + ")");
     }
 
 
@@ -381,7 +370,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
                     cursor.moveToNext();
                     if (path != null && path.endsWith(".mp3")) {
-                        if(!new File(path).getParentFile().getName().equals("THD Music")){
+                        if (!new File(path).getParentFile().getName().equals("THD Music")) {
                             boolean check_fav = false;
                             boolean check_playlist = false;
 
@@ -439,13 +428,17 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         } catch (Exception e) {
             return fileList;
         }
+
     }
 
+    // lấy chuõi id fav(or playlist) gán vào 1 danh sách String
     public ArrayList<String> get_arr_id(String id_song) {
         String arr[] = id_song.split("-");
+        Log.d("III", "arr[]: " + arr.length);
         return new ArrayList<>(Arrays.asList(arr));
     }
 
+    // lấy danh sách String id của fav(or playtlist) gán vào danh sách bài hát Fav(or Playlist)
     public ArrayList<Music> create_fav_playlist_music(ArrayList<String> arrayList) {
         ArrayList<Music> arrTemp = new ArrayList<>();
         for (String id : arrayList) {
@@ -475,6 +468,19 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
         arrSong = new ArrayList<>();
         arrSong = getPlayList(Environment.getExternalStorageDirectory() + "/THD Music");
+
+        Collections.sort(arrSong, new Comparator<Music>() {
+            @Override
+            public int compare(Music o1, Music o2) {
+                return compare(new File(o2.getPath()).lastModified(), new File(o1.getPath()).lastModified());
+            }
+
+            private int compare(long lastModified, long lastModified1) {
+                return (int) (lastModified - lastModified1);
+            }
+        });
+
+
         arrSong.addAll(getPlayList(Environment.getExternalStorageDirectory() + "/Zing MP3"));
         arrSong.addAll(scanDeviceForMp3Files());
 
@@ -619,6 +625,29 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Boolean check_change_share = data.getBooleanExtra("check_change_share", false);
+            btnSong.setText("Bài hát(" + arrSong.size() + ")");
+            if (check_change_share) {
+                arrFav.clear();
+                arrPlaylist.clear();
+                for (Music music : arrSong) {
+                    if (music.isCheck_fav()) {
+                        arrFav.add(music);
+                    }
+                    if (music.isCheck_playlist()) {
+                        arrPlaylist.add(music);
+                    }
+                }
+                btnPlaylist.setText("Playlist(" + arrPlaylist.size() + ")");
+                btnFav.setText("Yêu thích(" + arrFav.size() + ")");
+            }
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSongs:
@@ -626,21 +655,21 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                 KEY_SONGS = "songs";
                 intent.putExtra(KEY, arrSong);
                 intent.putExtra(KEY_SONGS, KEY_SONGS);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
             case R.id.btnPlaylists:
                 intent = new Intent(this, OfflineActivity.class);
                 KEY_SONGS = "playlists";
                 intent.putExtra(KEY, arrPlaylist);
                 intent.putExtra(KEY_SONGS, KEY_PLAYLISTS);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
             case R.id.btnFav:
                 intent = new Intent(this, OfflineActivity.class);
                 KEY_SONGS = "favorites";
                 intent.putExtra(KEY, arrFav);
                 intent.putExtra(KEY_SONGS, KEY_FAVORITES);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
             case R.id.btnVietNam:
                 intent = new Intent(this, OnlineActivity.class);

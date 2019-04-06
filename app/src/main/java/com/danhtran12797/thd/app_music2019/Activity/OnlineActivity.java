@@ -1050,7 +1050,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         Log.d("TTT", "onDestroy");
     }
 
-
     public class AsynTask_Start_MusicOn extends AsyncTask<String, Void, Boolean> {
 
         @Override
