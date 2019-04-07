@@ -499,13 +499,13 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             public void run() {
                 if (check_onBackPressed) {
                     handler.removeCallbacks(this);//dừng handler
-                    stopPlayer();
+                    //stopPlayer();
                 } else {
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                    handler.postDelayed(this, 500);
+                    handler.postDelayed(this, 1000);
                 }
             }
-        }, 100);
+        }, 1000);
     }
 
     public void setTimeTotal() {
@@ -599,6 +599,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         protected void onPreExecute() {
             super.onPreExecute();
             showDialog(progress_bar_type);
+            pDialog.setProgress(0);
         }
 
         /**
@@ -680,7 +681,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             return true;
         }
     }
-
 
     public void startDownload(final MusicOn song) {
         if (song == null) {
@@ -904,7 +904,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             Log.d("DDD", "Start playback");
         }
 
-
         return true;
     }
 
@@ -1023,6 +1022,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.img_reload:
                 new AsynTask_Start_MusicOn().execute();
+                check_onBackPressed=true;
                 break;
             case R.id.img_account:
                 intent = new Intent(this, AccountActivity.class);
@@ -1059,9 +1059,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             mVuMeterView.stop(false);
             startAnim();
             get_url_music();
+            //check_onBackPressed=true;
         }
 
         protected Boolean doInBackground(String... strings) {
+            //Log.d("CCC",url);
             return asyn_load_music(url);
         }
 
