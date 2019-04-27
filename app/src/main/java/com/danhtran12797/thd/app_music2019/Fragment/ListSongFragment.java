@@ -49,6 +49,7 @@ public class ListSongFragment extends Fragment {
     private RelativeLayout relativeLayout;
     public static FragmentContactListener listener;
     public static AddFavPlaylistListener listener1;
+    public static DeleteSongListener listener2;
     private BottomSheetDialog bottomSheetDialog;
 
     long date_download = 0;
@@ -59,6 +60,10 @@ public class ListSongFragment extends Fragment {
 
     public interface FragmentContactListener {
         void onInpuSent(int position);
+    }
+
+    public interface DeleteSongListener {
+        void onInpuSent2(int position);
     }
 
     public interface AddFavPlaylistListener {
@@ -149,9 +154,8 @@ public class ListSongFragment extends Fragment {
                     public void onClick(View v) {
                         File file = new File(music.getPath());
                         if (file.delete()) {
-                            delete_arrMusic_local(position);
-                            arrMusic.remove(position);
-                            musicAdapter.notifyItemRemoved(position);
+                            Toast.makeText(getContext(), "Đã xóa bài hát '"+music.getNameSong()+"' thành công", Toast.LENGTH_SHORT).show();
+                            listener2.onInpuSent2(position);
                         }
                         bottomSheetDialog.dismiss();
                     }
@@ -246,6 +250,7 @@ public class ListSongFragment extends Fragment {
         if (context instanceof FragmentContactListener) {
             listener = (FragmentContactListener) context;
             listener1 = (AddFavPlaylistListener) context;
+            listener2= (DeleteSongListener) context;
         } else {
             throw new RuntimeException(context.toString() + "must implement FragmentContactListener");
         }
@@ -256,6 +261,7 @@ public class ListSongFragment extends Fragment {
         super.onDetach();
         listener = null;
         listener1 = null;
+        listener2=null;
     }
 
     @Override

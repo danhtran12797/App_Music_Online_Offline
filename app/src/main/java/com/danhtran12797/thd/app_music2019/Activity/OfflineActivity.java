@@ -64,7 +64,8 @@ import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.recy
 import static com.thekhaeng.pushdownanim.PushDownAnim.MODE_SCALE;
 
 
-public class OfflineActivity extends AppCompatActivity implements ListSongFragment.FragmentContactListener, View.OnClickListener, AudioManager.OnAudioFocusChangeListener, ListSongFragment.AddFavPlaylistListener {
+public class OfflineActivity extends AppCompatActivity implements ListSongFragment.FragmentContactListener, View.OnClickListener
+        , AudioManager.OnAudioFocusChangeListener, ListSongFragment.AddFavPlaylistListener, ListSongFragment.DeleteSongListener{
     private ViewPager viewPager;
     public ViewPagerAdapter viewPagerAdapter;
     //private TabLayout tabLayout;
@@ -797,6 +798,20 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         }
         if (this.position == position) {
             check_fav_playlist(position);
+        }
+    }
+
+    @Override
+    public void onInpuSent2(int position) {
+        check_change_share = true;
+        delete_arrMusic_local(position);
+        arrMusic.remove(position);
+        musicAdapter.notifyItemRemoved(position);
+
+        if (this.position == position) {
+            //check_fav_playlist(this.position);
+            this.position--;
+            startPlayer();
         }
     }
 }

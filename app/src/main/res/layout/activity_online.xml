@@ -32,7 +32,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
                 android:orientation="vertical">
 
                 <RelativeLayout
@@ -72,7 +72,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_weight="1.2">
 
                 <io.gresse.hugo.vumeterlibrary.VuMeterView
                     android:id="@+id/vumeter_on"
@@ -97,17 +97,7 @@
                     android:paddingTop="@dimen/seekbar"
                     android:paddingBottom="@dimen/seekbar" />
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/ic_file_download"
-                    app:borderWidth="0dp"
-                    app:fabSize="normal"
-                    app:rippleColor="#20CC13" />
+
 
 
                 <com.wang.avi.AVLoadingIndicatorView
@@ -209,15 +199,18 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/layout_animation_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <!--<com.danhtran12797.thd.app_music2019.Activity.StarAnimationView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent" />-->
-            </LinearLayout>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_above="@+id/fullscreen_content_controls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_file_download"
+                app:borderWidth="0dp"
+                app:fabSize="normal"
+                app:rippleColor="#20CC13" />
 
             <LinearLayout
                 android:id="@+id/fullscreen_content_controls"
@@ -257,6 +250,16 @@
                     android:layout_weight="0.5"
                     android:src="@drawable/ic_person" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_animation_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <!--<com.danhtran12797.thd.app_music2019.Activity.StarAnimationView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent" />-->
             </LinearLayout>
         </RelativeLayout>
 

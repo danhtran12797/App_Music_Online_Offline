@@ -750,7 +750,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == STORAGE_PERMISSION_CODE_WRITE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Đã được cho phép", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Đã được cho phép", Toast.LENGTH_LONG).show();
                 startDownload(song_download);
             } else {
                 Toast.makeText(this, "Từ chối xác nhận quyền", Toast.LENGTH_SHORT).show();
