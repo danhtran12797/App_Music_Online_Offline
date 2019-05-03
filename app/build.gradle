@@ -6,8 +6,8 @@ android {
         applicationId "com.danhtran12797.thd.app_music2019"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -56,5 +56,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     //heart
     implementation 'io.gresse.hugo.vumeterlibrary:vumeterlibrary:1.0.17'
+    //admob
+    implementation 'com.google.firebase:firebase-ads:17.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

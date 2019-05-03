@@ -42,6 +42,9 @@ import android.widget.Toast;
 
 import com.danhtran12797.thd.app_music2019.Model.Music;
 import com.danhtran12797.thd.app_music2019.R;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -121,12 +124,20 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     public static final int ANIM_ITEM_DURATION = 1000;
     public static final int ITEM_DELAY = 300;
 
+    private AdView mAdView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_load);
 
+        MobileAds.initialize(this,
+                "ca-app-pub-3584305127333859~7316781574");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         toolbar = findViewById(R.id.toolbar_home);
         setSupportActionBar(toolbar);
