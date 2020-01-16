@@ -6,13 +6,15 @@
     android:id="@+id/frame_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/new_year10"
+    android:background="@drawable/custom_background_activity_load"
     tools:context=".Activity.OnlineActivity">
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/imgBackgroundSong"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:foreground="@drawable/alpha_background_white"></RelativeLayout>
+        android:foreground="@drawable/alpha_background_music_online"
+        android:scaleType="centerCrop" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -45,15 +47,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="7dp"
-                        android:src="@drawable/image_load"
-                        app:civ_border_color="#653B3B"
+                        android:src="@mipmap/ic_launcher"
+                        app:civ_border_color="@android:color/darker_gray"
                         app:civ_border_width="1dp" />
-                    <!--#653B3B-->
-                    <ImageView
-                        android:id="@+id/img_cycle"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/vong6" />
                 </RelativeLayout>
 
                 <TextView
@@ -61,12 +57,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/imgAvatar"
-                    android:fontFamily="@font/vivaldi"
+                    android:fontFamily="serif-monospace"
                     android:gravity="center"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:text="Tran Hung Danh"
-                    android:textColor="@android:color/background_dark"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
             </LinearLayout>
 
             <RelativeLayout
@@ -97,17 +94,13 @@
                     android:paddingTop="@dimen/seekbar"
                     android:paddingBottom="@dimen/seekbar" />
 
-
-
-
                 <com.wang.avi.AVLoadingIndicatorView
                     android:id="@+id/avi"
                     style="@style/AVLoadingIndicatorView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:visibility="visible"
-                    app:indicatorColor="@android:color/background_dark"
+                    app:indicatorColor="@android:color/white"
                     app:indicatorName="BallPulseIndicator" />
 
                 <TextView
@@ -115,12 +108,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:fontFamily="@font/vivaldi"
+                    android:fontFamily="serif-monospace"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     android:text="@string/name_song_wecome"
-                    android:textColor="@android:color/background_dark"
-                    android:textSize="20sp" />
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp" />
 
                 <TextView
                     android:id="@+id/txt_name_singer"
@@ -128,12 +121,13 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txt_name_song"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="@font/vivaldi"
+                    android:fontFamily="serif-monospace"
                     android:paddingLeft="5dp"
+                    android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:text="@string/app_name"
-                    android:textColor="@android:color/background_dark"
-                    android:textSize="20sp" />
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -199,11 +193,11 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab"
-                android:layout_above="@+id/fullscreen_content_controls"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_above="@+id/fullscreen_content_controls"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"

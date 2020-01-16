@@ -20,27 +20,17 @@
     <string name="no_internet_connect">Không có kết nối internet!</string>
 
     <string name="name_app_dialog">Tên: <b>THD Music</b></string>
-    <string name="version_app">Phiên bản: <b>1.0</b></string>
+    <string name="version_app">Phiên bản: <b>2.4</b></string>
     <string name="func_app">Chức năng: <b>Nghe nhạc online, offline</b></string>
     <string name="developer_by">Thực hiện bởi: <a href="https://www.facebook.com/danhtran12797"><b>danhtran12797</b></a> </string>
     <string name="contact_me_app">Email: <b>danhtran12797@gmail.com</b></string>
 
     <string name="infor_song">Tên: %s\nCa sĩ: %s\nLocation: %s\nNgày tải xuống: %s\nThời gian phát: %s\nThể loại: %s</string>
 
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="example_login">Chào bạn,\nNếu đây lần đầu bạn sử dụng ứng dụng này bạn cần đăng ký tài khoản rồi đăng nhập.\n
+        <b>VD: abcxyz@gmail.com</b> <p>&#128077;</p>\nCảm ơn bạn!</string>
 
-    <string-array name="arr_cycle">
-        <item>vong2</item>
-        <item>vong3</item>
-        <item>vong4</item>
-        <item>vong5</item>
-        <item>vong6</item>
-        <item>vong7</item>
-        <item>vong8</item>
-        <item>vong9</item>
-        <item>vong10</item>
-        <item>vong11</item>
-    </string-array>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
     <string-array name="lstFlower">
         <item>hoadao_144</item>
@@ -57,5 +47,7 @@
         <item>star</item>
     </string-array>
 
+    <string name="pauset">PAUSE</string>
+    <string name="playt">PLAY</string>
 
 </resources>

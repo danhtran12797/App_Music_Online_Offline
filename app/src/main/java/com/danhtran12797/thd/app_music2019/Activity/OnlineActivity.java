@@ -1,37 +1,34 @@
 package com.danhtran12797.thd.app_music2019.Activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -44,17 +41,29 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.danhtran12797.thd.app_music2019.Model.Background;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.core.app.ActivityCompat;
+
 import com.danhtran12797.thd.app_music2019.Model.Music;
 import com.danhtran12797.thd.app_music2019.Model.MusicOn;
 import com.danhtran12797.thd.app_music2019.R;
+import com.danhtran12797.thd.app_music2019.Receiver.HeadSetReceiver;
+import com.danhtran12797.thd.app_music2019.Receiver.MediaButtonIntentReceiver;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.thekhaeng.pushdownanim.PushDownAnim;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -81,27 +90,10 @@ import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.name_use
 import static com.danhtran12797.thd.app_music2019.Activity.LoadActivity.url_avatar;
 import static com.thekhaeng.pushdownanim.PushDownAnim.MODE_SCALE;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-public class OnlineActivity extends BaseActivity implements View.OnClickListener, AudioManager.OnAudioFocusChangeListener {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
+public class OnlineActivity extends BaseActivity implements View.OnClickListener, AudioManager.OnAudioFocusChangeListener, HeadSetReceiver.IHeadSet, MediaButtonIntentReceiver.MediaButtonListener {
     private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
@@ -144,20 +136,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-//    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-//        @Override
-//        public boolean onTouch(View view, MotionEvent motionEvent) {
-//            if (AUTO_HIDE) {
-//                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-//            }
-//            return false;
-//        }
-//    };
+
     private FloatingActionButton fab;
 
     Spinner spinner;
@@ -172,7 +151,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     private TextView txt_name_singer;
     private TextView txt_name_user;
     private CircleImageView imgAvatar;
-    // private Toolbar toolbar;
     private LinearLayout layout_anim; // layout home, spinner, account
 
     private FrameLayout layout; // layout main(background)
@@ -184,8 +162,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     private ImageView img_anim;
     private ImageView img_account;
     private ImageView img_home;
-
-    private ImageView img_cycle;
 
     private MediaPlayer mediaPlayer = null;
 
@@ -203,19 +179,15 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
     private FirebaseDatabase database;
     private DatabaseReference myRef;
-    private DatabaseReference myRef1;
 
     //private ArrayList<MusicOn> arrMusicOn;
     private ArrayList<MusicOn> arrMusicVN;
     private ArrayList<MusicOn> arrMusicAu;
     private ArrayList<MusicOn> arrMusicA;
 
-    private ArrayList<Background> arrBackground;
-
     private ArrayList<String> arrFlower;
-    private ArrayList<String> arrCycle;
 
-    public static int id_start_anim; //id background layout main
+    public int id_start_anim; //id background layout main
 
     private Intent intent;
 
@@ -229,7 +201,18 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
     private SeekBar seekBar;
     private boolean check_onBackPressed = false;
     private VuMeterView mVuMeterView;
-    Switch switch_sk;
+    private Switch switch_sk;
+
+    private HeadSetReceiver headSetReceiver;
+
+    private InterstitialAd mInterstitialAd;
+
+    private ImageView blurImageView;
+    private ObjectAnimator objectAnimator;
+    ;
+
+    private MediaButtonIntentReceiver r;
+    private int count_media_button = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,11 +223,34 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
         setContentView(R.layout.activity_online);
 
+        headSetReceiver = new HeadSetReceiver(this);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(headSetReceiver, filter);
+
+        r = new MediaButtonIntentReceiver(this);
+
+        ((AudioManager) getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(
+                new ComponentName(
+                        getPackageName(),
+                        MediaButtonIntentReceiver.class.getName()));
+
+        MobileAds.initialize(this, "ca-app-pub-3584305127333859~7316781574");
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3584305127333859/8555402128");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                // Load the next interstitial.
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+
+        });
+
         mediaPlayer = new MediaPlayer();
 
-        switch_sk = findViewById(R.id.switch_sk);
-        mVuMeterView = findViewById(R.id.vumeter_on);
-        seekBar = findViewById(R.id.seekBar_on);
+        initView();
 
         switch_sk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -274,24 +280,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        layout = findViewById(R.id.frame_layout);
-
-        txt_name_user = findViewById(R.id.txt_name_user);
-        txt_name_song = findViewById(R.id.txt_name_song);
-        txt_name_singer = findViewById(R.id.txt_name_singer);
-        imgAvatar = findViewById(R.id.imgAvatar);
-
-        mSwitch = findViewById(R.id.swState);
-        img_anim = findViewById(R.id.img_anim);
-        img_anim.setEnabled(false);
-        img_off_music = findViewById(R.id.img_baseline);
-        img_play_music = findViewById(R.id.img_play_stop);
-        img_random_music = findViewById(R.id.img_reload);
-        img_account = findViewById(R.id.img_account);
-        img_home = findViewById(R.id.img_home_online);
-
-        img_cycle = findViewById(R.id.img_cycle);
-
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         PushDownAnim.setPushDownAnimTo(img_anim, img_off_music, img_play_music, img_random_music, img_home, img_account)
@@ -302,44 +290,10 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 .setInterpolatorRelease(PushDownAnim.DEFAULT_INTERPOLATOR)
                 .setOnClickListener(this);
 
-        layout_anim = findViewById(R.id.layout_anim);
-        fab = findViewById(R.id.fab);
-
         String arr[] = getResources().getStringArray(R.array.lstFlower);
         arrFlower = new ArrayList<>(Arrays.asList(arr));
 
-        String arr1[] = getResources().getStringArray(R.array.arr_cycle);
-        arrCycle = new ArrayList<>(Arrays.asList(arr1));
-
-        spinner = findViewById(R.id.spinner);
-        arrCategoryMusic = new ArrayList<>();
-        arrCategoryMusic.add("VN");
-        arrCategoryMusic.add("US-UK");
-        arrCategoryMusic.add("K-POP");
-        adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, arrCategoryMusic);
-        spinner.setAdapter(adapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
-                ((TextView) parent.getChildAt(0)).setGravity(Gravity.CENTER);
-                ((TextView) parent.getChildAt(0)).setTypeface(((TextView) parent.getChildAt(0)).getTypeface(), Typeface.BOLD);
-                ((TextView) parent.getChildAt(0)).setTextSize(18);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
         //mAnimationView = (StarAnimationView) findViewById(R.id.animated_view);
-        layout_animation_view = findViewById(R.id.layout_animation_view); //contain ainmation
-        layout_animation_view.removeAllViews();
-        avi = findViewById(R.id.avi);
-        avi.hide();
-
         //animation = AnimationUtils.loadAnimation(this, R.anim.anim_alpha);
         //imgAvatar.startAnimation(animation);
 
@@ -364,20 +318,12 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
-
-
-        // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggle();
             }
         });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -393,43 +339,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         });
 
         database = FirebaseDatabase.getInstance();
-        myRef1 = database.getReference("2").child("data");
         myRef = database.getReference("3").child("data");
 
         arrMusicVN = new ArrayList<>();
         arrMusicAu = new ArrayList<>();
         arrMusicA = new ArrayList<>();
-
-        //arrMusicOn = new ArrayList<>();
-        arrBackground = new ArrayList<>();
-
-        myRef1.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Background background = dataSnapshot.getValue(Background.class);
-                arrBackground.add(background);
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         myRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -462,14 +376,44 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d("DDD", "onCancelled: ");
             }
         });
 
+        createSpinnerAdapter();
+        createObjectAnimator();
+        get_intent();
 
+    }
+
+    private void createSpinnerAdapter() {
+        spinner = findViewById(R.id.spinner);
+        arrCategoryMusic = new ArrayList<>();
+        arrCategoryMusic.add("VN");
+        arrCategoryMusic.add("US-UK");
+        arrCategoryMusic.add("K-POP");
+        adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, arrCategoryMusic);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+                ((TextView) parent.getChildAt(0)).setGravity(Gravity.CENTER);
+                ((TextView) parent.getChildAt(0)).setTypeface(((TextView) parent.getChildAt(0)).getTypeface(), Typeface.BOLD);
+                ((TextView) parent.getChildAt(0)).setTextSize(18);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void get_intent() {
         intent = getIntent();
         if (intent != null) {
-            //selected = intent.getIntExtra(KEY, 0);
             spinner.setSelection(intent.getIntExtra(KEY, 0));
             Picasso.get()
                     .load(url_avatar)
@@ -478,6 +422,46 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                     .into(imgAvatar);
             txt_name_user.setText(name_user);
         }
+    }
+
+    private void initView() {
+        switch_sk = findViewById(R.id.switch_sk);
+        mVuMeterView = findViewById(R.id.vumeter_on);
+        seekBar = findViewById(R.id.seekBar_on);
+
+        blurImageView = findViewById(R.id.imgBackgroundSong);
+        layout = findViewById(R.id.frame_layout);
+
+        txt_name_user = findViewById(R.id.txt_name_user);
+        txt_name_song = findViewById(R.id.txt_name_song);
+        txt_name_singer = findViewById(R.id.txt_name_singer);
+        imgAvatar = findViewById(R.id.imgAvatar);
+
+        mSwitch = findViewById(R.id.swState);
+        img_anim = findViewById(R.id.img_anim);
+        img_anim.setEnabled(false);
+        img_off_music = findViewById(R.id.img_baseline);
+        img_play_music = findViewById(R.id.img_play_stop);
+        img_random_music = findViewById(R.id.img_reload);
+        img_account = findViewById(R.id.img_account);
+        img_home = findViewById(R.id.img_home_online);
+
+        layout_anim = findViewById(R.id.layout_anim);
+        fab = findViewById(R.id.fab);
+
+        layout_animation_view = findViewById(R.id.layout_animation_view); //contain ainmation
+        layout_animation_view.removeAllViews();
+        avi = findViewById(R.id.avi);
+        avi.hide();
+    }
+
+    public void createObjectAnimator() {
+        objectAnimator = ObjectAnimator.ofFloat(imgAvatar, "rotation", 0f, 360f);
+        objectAnimator.setDuration(13000);
+        objectAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        objectAnimator.setRepeatMode(ValueAnimator.RESTART);
+        objectAnimator.setInterpolator(new LinearInterpolator());
+        objectAnimator.setTarget(imgAvatar);
     }
 
     public void show_seekbar() {
@@ -499,7 +483,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             public void run() {
                 if (check_onBackPressed) {
                     handler.removeCallbacks(this);//dừng handler
-                    //stopPlayer();
+//                    stopPlayer();
                 } else {
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     handler.postDelayed(this, 1000);
@@ -510,6 +494,80 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
     public void setTimeTotal() {
         seekBar.setMax(mediaPlayer.getDuration());
+    }
+
+    @Override
+    public void onHeadSetOffline(int state) {
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onHeadSetOnline(int state) {
+        switch (state) {
+            case 0:
+                Log.d("DDD", "onHeadSetOnline: 0");
+                if (mediaPlayer != null) {
+                    Log.d("DDD", "onHeadSetOnline: " + check_play_stop);
+                    if (check_play_stop == 1) {
+                        mediaPlayer.pause();
+                        mVuMeterView.pause();
+                        objectAnimator.pause();
+                        img_play_music.setImageResource(R.drawable.ic_play);
+                        check_play_stop = 2;
+                    }
+                }
+                break;
+            case 1:
+                Log.d("DDD", "onHeadSetOnline: 1");
+                if (mediaPlayer != null) {
+                    if (check_play_stop == 2) {
+                        resumePlayer();
+                    }
+                }
+                break;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void processMediaButton(int t) {
+        if (t == 1) {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    pausePlayer();
+                } else {
+                    resumePlayer();
+                }
+            }
+        } else if (t == 2) {
+            if (check_play_stop == 0) {
+                if (!objectAnimator.isStarted()) {
+                    objectAnimator.start();
+                }
+                new AsynTask_Start_MusicOn().execute();
+            } else {
+                if (!objectAnimator.isStarted()) {
+                    objectAnimator.start();
+                } else if (objectAnimator.isPaused()) {
+                    objectAnimator.resume();
+                }
+                new AsynTask_Start_MusicOn().execute();
+                check_onBackPressed = true;
+            }
+        }
+    }
+
+    @Override
+    public void onMediaButtonSent() {
+        count_media_button++;
+        new Handler().postDelayed(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                processMediaButton(count_media_button);
+                count_media_button = 0;
+            }
+        }, 400);
     }
 
     public class DownloadLyricFromURL extends AsyncTask<MusicOn, Void, Void> {
@@ -600,6 +658,12 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             super.onPreExecute();
             showDialog(progress_bar_type);
             pDialog.setProgress(0);
+
+            if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            } else {
+                Log.d("TAG", "The interstitial wasn't loaded yet.");
+            }
         }
 
         /**
@@ -739,6 +803,10 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     protected void onStop() {
@@ -770,51 +838,6 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         layout_animation_view.addView(mAnimationView);
     }
 
-    // Random background và set color nameSong, nameAuthor
-    public void Random_background() {
-        Collections.shuffle(arrBackground);
-        if (arrBackground.size() == 0) {
-            return;
-        }
-        final Background background = arrBackground.get(0);
-
-        Picasso.get().load(background.getUrl()).into(new Target() {
-            @SuppressLint("NewApi")
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Drawable dr = new BitmapDrawable(bitmap);
-                layout.setBackground(dr);
-
-                if (background.getColor().equals("1")) {
-                    txt_name_user.setTextColor(Color.WHITE);
-                    txt_name_song.setTextColor(Color.WHITE);
-                    txt_name_singer.setTextColor(Color.WHITE);
-                } else {
-                    txt_name_user.setTextColor(Color.BLACK);
-                    txt_name_song.setTextColor(Color.BLACK);
-                    txt_name_singer.setTextColor(Color.BLACK);
-                }
-                Log.d("PPP", "onBitmapLoaded");
-            }
-
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                Log.d("PPP", "onBitmapFailed");
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Log.d("PPP", "onPrepareLoad");
-            }
-        });
-    }
-
-    // Random vòng Avatar
-    public void Random_cycle() {
-        Collections.shuffle(arrCycle);
-        int id_cycle = getResources().getIdentifier(arrCycle.get(0), "drawable", getPackageName()); // lấy id từ tên
-        img_cycle.setImageResource(id_cycle);
-    }
 
     // get url và set Text nameSong, author
     public void get_url_music() {
@@ -845,11 +868,18 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
 
         song_download = music; // đường dẫn download file
-
-        txt_name_song.setText(music.getName_song());
-        txt_name_singer.setText(music.getName_author());
-
         url = music.getSong_url();
+
+        txt_name_song.setText(song_download.getName_song());
+        txt_name_singer.setText(song_download.getName_author());
+        Picasso.get().load(song_download.getImage_url())
+                .error(R.drawable.ic_error_outline)
+                .into(blurImageView);
+
+        Picasso.get().load(song_download.getImage_url())
+                .placeholder(R.drawable.image_load)
+                .error(R.drawable.ic_error_outline)
+                .into(imgAvatar);
     }
 
     // check can start mediaPlayer or return error
@@ -914,9 +944,52 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void pausePlayer() {
         if (mediaPlayer != null) {
-            mediaPlayer.pause();
+            if (mediaPlayer.isPlaying()) {
+                new CountDownTimer(900, 100) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        Log.d("HHH", "onTick: " + millisUntilFinished / 1000f);
+                        mediaPlayer.setVolume(millisUntilFinished / 1000f, millisUntilFinished / 1000f);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        Log.d("HHH", "onFinish: ");
+                        mediaPlayer.pause();
+                    }
+                }.start();
+                mVuMeterView.pause();
+                objectAnimator.pause();
+                img_play_music.setImageResource(R.drawable.ic_play);
+                check_play_stop = 2;
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void resumePlayer() {
+        if (mediaPlayer != null) {
+            new CountDownTimer(900, 100) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    Log.d("OOO", "onTick: " + (1 - millisUntilFinished / 1000f));
+                    mediaPlayer.setVolume((1 - millisUntilFinished / 1000f), (1 - millisUntilFinished / 1000f));
+                }
+
+                @Override
+                public void onFinish() {
+                    Log.d("OOO", "onFinish: ");
+                    mediaPlayer.setVolume(1.0f, 1.0f);
+                }
+            }.start();
+            mediaPlayer.start();
+            objectAnimator.resume();
+            mVuMeterView.resume(true);
+            img_play_music.setImageResource(R.drawable.ic_pause);
+            check_play_stop = 1;
         }
     }
 
@@ -977,6 +1050,7 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View v) {
 
@@ -999,30 +1073,44 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 seekBar.setProgress(0);
                 mVuMeterView.stop(true);
 
+                Picasso.get()
+                        .load(url_avatar)
+                        .placeholder(R.drawable.image_load)
+                        .error(R.drawable.ic_error_outline)
+                        .into(imgAvatar);
+                txt_name_user.setText(name_user);
+                blurImageView.setImageResource(R.drawable.custom_background_activity_load);
+                objectAnimator.end();
+                objectAnimator.cancel();
+                txt_name_user.setVisibility(View.VISIBLE);
+
                 check_play_stop = 0;
                 img_play_music.setImageResource(R.drawable.ic_play);
                 stopPlayer();
                 txt_name_song.setText(getString(R.string.name_song_wecome));
                 txt_name_singer.setText(getString(R.string.app_name));
+
                 break;
             case R.id.img_play_stop:
                 if (check_play_stop == 0) {
+                    if (!objectAnimator.isStarted()) {
+                        objectAnimator.start();
+                    }
                     new AsynTask_Start_MusicOn().execute();
                 } else if (check_play_stop == 1) {
-                    mVuMeterView.pause();
                     pausePlayer();
-                    img_play_music.setImageResource(R.drawable.ic_play);
-                    check_play_stop = 2;
                 } else {
-                    mVuMeterView.resume(true);
-                    mediaPlayer.start();
-                    img_play_music.setImageResource(R.drawable.ic_pause);
-                    check_play_stop = 1;
+                    resumePlayer();
                 }
                 break;
             case R.id.img_reload:
+                if (!objectAnimator.isStarted()) {
+                    objectAnimator.start();
+                } else if (objectAnimator.isPaused()) {
+                    objectAnimator.resume();
+                }
                 new AsynTask_Start_MusicOn().execute();
-                check_onBackPressed=true;
+                check_onBackPressed = true;
                 break;
             case R.id.img_account:
                 intent = new Intent(this, AccountActivity.class);
@@ -1047,7 +1135,11 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         audioManager.abandonAudioFocus(this);
         check_onBackPressed = true;
         stopPlayer();
-        Log.d("TTT", "onDestroy");
+        unregisterReceiver(headSetReceiver);
+        ((AudioManager) getSystemService(AUDIO_SERVICE)).unregisterMediaButtonEventReceiver(
+                new ComponentName(
+                        getPackageName(),
+                        MediaButtonIntentReceiver.class.getName()));
     }
 
     public class AsynTask_Start_MusicOn extends AsyncTask<String, Void, Boolean> {
@@ -1059,11 +1151,9 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
             mVuMeterView.stop(false);
             startAnim();
             get_url_music();
-            //check_onBackPressed=true;
         }
 
         protected Boolean doInBackground(String... strings) {
-            //Log.d("CCC",url);
             return asyn_load_music(url);
         }
 
@@ -1075,16 +1165,21 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
 
             img_play_music.setImageResource(R.drawable.ic_pause);
             if (aBoolean.equals(false)) {
-                showDialog("THD Music", "Vui lòng kiểm tra Internet", R.color.pdlg_color_blue);
-
+                if (!isOnline()) {
+                    showDialog("THD Music", "Vui lòng kiểm tra Internet", R.color.pdlg_color_blue);
+                } else if (arrMusicVN.size() == 0 || arrMusicAu.size() == 0 || arrMusicA.size() == 0) {
+                    showDialog("THD Music", "Loading...\nBạn thử nhấn phát bài hát một lần nữa :)", R.color.pdlg_color_gray);
+                }
+                objectAnimator.end();
                 check_play_stop = 0;
                 img_play_music.setImageResource(R.drawable.ic_play);
                 stopPlayer();
                 txt_name_song.setText(getString(R.string.name_song_wecome));
                 txt_name_singer.setText(getString(R.string.app_name));
             } else {
-                Random_cycle();
-                Random_background();
+//                Random_cycle();
+//                Random_background();
+
                 mVuMeterView.resume(true);
                 //show_seekbar();
                 check_onBackPressed = false;
@@ -1095,13 +1190,15 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                         Random_animaton_view();
                 }
                 check_play_stop = 1;
+
             }
-            Log.d("TTT", "onPostExecute_load_song");
         }
     }
 
     void startAnim() {
         //avi.show();
+        txt_name_user.setVisibility(View.GONE);
+        check_onBackPressed = true;
         avi.smoothToShow();
         txt_name_singer.setVisibility(View.GONE);
         txt_name_song.setVisibility(View.GONE);
@@ -1142,30 +1239,19 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
         prettyDialog.show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onAudioFocusChange(int focusChange) { // check audio từ bên ngoài
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 Log.d("DDD", "AUDIOFOCUS_GAIN");
-                // resume playback
-//                if (mediaPlayer == null){ //initMediaPlayer();
-//                    mediaPlayer=new MediaPlayer();
-//                }
-//                else if (!mediaPlayer.isPlaying()) mediaPlayer.start();
-//                mediaPlayer.setVolume(1.0f, 1.0f);
+                resumePlayer();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.d("DDD", "AUDIOFOCUS_LOSS");
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-
-                check_play_stop = 0;
-                img_play_music.setImageResource(R.drawable.ic_play);
-                check_onBackPressed = true;
-                stopPlayer();
-                txt_name_song.setText(getString(R.string.name_song_wecome));
-                txt_name_singer.setText(getString(R.string.app_name));
-
+                pausePlayer();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -1173,17 +1259,14 @@ public class OnlineActivity extends BaseActivity implements View.OnClickListener
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
-                if (mediaPlayer.isPlaying()) {
-                    img_play_music.setImageResource(R.drawable.ic_play);
-                    mediaPlayer.pause();
-                }
+                pausePlayer();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 Log.d("DDD", "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                // Lost focus for a short time, but it's ok to keep playing
-                // at an attenuated level
-                if (mediaPlayer.isPlaying()) mediaPlayer.setVolume(0.1f, 0.1f);
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.setVolume(0.1f, 0.1f);
+                }
                 break;
         }
     }

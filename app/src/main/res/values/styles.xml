@@ -41,7 +41,11 @@
         <item name="android:windowBackground">@drawable/bg_splashscreen</item>
     </style>
 
-
+    <style name="NavigationDrawerStyle">
+        <item name="android:textColor">#757575</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
 
 </resources>

@@ -12,7 +12,7 @@
         android:alpha="0.2"
         android:src="@drawable/ic_music" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,6 +20,6 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
 </RelativeLayout>

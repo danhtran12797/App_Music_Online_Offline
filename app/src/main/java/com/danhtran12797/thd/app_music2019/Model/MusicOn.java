@@ -9,17 +9,24 @@ public class MusicOn implements Serializable {
     private String name_author;
     private String song_url;
     private String download_url;
+    private String image_url;
 
     public MusicOn() {
+
     }
 
-    public MusicOn(String id, String id_category, String name_song, String name_author, String song_url, String download_url) {
+    public MusicOn(String id, String id_category, String name_song, String name_author, String song_url, String download_url, String image_url) {
         this.id = id;
         this.id_category = id_category;
         this.name_song = name_song;
         this.name_author = name_author;
         this.song_url = song_url;
         this.download_url = download_url;
+        this.image_url=image_url;
+    }
+
+    public String getImage_url() {
+        return image_url;
     }
 
     public String getDownload_url() {

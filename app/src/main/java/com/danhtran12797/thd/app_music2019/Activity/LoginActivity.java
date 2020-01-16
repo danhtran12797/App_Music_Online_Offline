@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.view.ViewCompat;
 import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -65,6 +65,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         setContentView(R.layout.activity_login);
 
+        showDialog("THD Music", getString(R.string.example_login), R.color.pdlg_color_blue);
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -74,7 +76,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         btnLogin.setOnClickListener(this);
         txtReg_now.setOnClickListener(this);
+    }
 
+    private void showDialog(String title, String message, int color) {
+        pDialog = new PrettyDialog(this)
+                .setTitle(title)
+                .setTitleColor(color)
+                .setMessage(message)
+                .setIcon(R.drawable.ic_info)
+                .setIconTint(color);
+        pDialog.show();
     }
 
     private void animate() {
@@ -131,10 +142,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
-
                             check_data_user(user.getUid());
+                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
                         } else { //đăng nhập sai, hoặc k có Internet
                             if (isOnline()) {

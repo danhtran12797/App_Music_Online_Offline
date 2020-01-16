@@ -8,14 +8,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +42,7 @@ public class ListSongFragment extends Fragment {
     private static final String ARG_ARR_MUSIC = "MUSICS";
 
     View view;
-    View view1;
+    View bottomSheetLayout;;
     public static RecyclerView recyclerView;
     private ArrayList<Music> arrMusics;
     public static MusicAdapter musicAdapter;
@@ -81,7 +81,7 @@ public class ListSongFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        Log.d("OfflineActivity", "onCreateView: OfflineActivity");
         arrMusics = new ArrayList<>();
 
         if (getArguments() != null) {
@@ -92,36 +92,41 @@ public class ListSongFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         relativeLayout = view.findViewById(R.id.background_list_music);
 
-        musicAdapter = new MusicAdapter(arrMusics, getContext(), new MusicAdapter.OnClickMenuSongBottomSheet() {
+        musicAdapter = new MusicAdapter(arrMusics, getContext(), new MusicAdapter.OnClickMenuSongBottomSheet() { // khởi tạo và xử lý các nút trong bottomSheet
             @Override
             public void show_bottom_sheet(final int position) {
 
-                boolean check_show_bs = false;
+                boolean check_show_bs = false; // set trạng thái có show bottomSheet chưa
                 final Music music = arrMusics.get(position);
 
-                view1 = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_layout, null);
+                // khởi tạo view java từ xml
+                bottomSheetLayout = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_layout, null);
 
                 bottomSheetDialog = new BottomSheetDialog(getContext());
-                bottomSheetDialog.setContentView(view1);
+                bottomSheetDialog.setContentView(bottomSheetLayout);
 
-                ImageView imgAvatar = view1.findViewById(R.id.img_avatar_bs);
-                TextView txtNameSong = view1.findViewById(R.id.txt_title_bs);
-                TextView txtNameAuthor = view1.findViewById(R.id.txt_author_bs);
-                ImageView imgLocation = view1.findViewById(R.id.imgLocal_bss);
-                LinearLayout playlist = view1.findViewById(R.id.layout_playlist_bs);
-                LinearLayout favorite = view1.findViewById(R.id.layout_favorite_bs);
-                LinearLayout infor = view1.findViewById(R.id.layout_infor_bs);
-                LinearLayout delete = view1.findViewById(R.id.layout_delete_bs);
+                // ánh xạ các view trong bottomSheetLayout
+                ImageView imgAvatar = bottomSheetLayout.findViewById(R.id.img_avatar_bs);
+                TextView txtNameSong = bottomSheetLayout.findViewById(R.id.txt_title_bs);
+                TextView txtNameAuthor = bottomSheetLayout.findViewById(R.id.txt_author_bs);
+                ImageView imgLocation = bottomSheetLayout.findViewById(R.id.imgLocal_bss);
+                LinearLayout playlist = bottomSheetLayout.findViewById(R.id.layout_playlist_bs);
+                LinearLayout favorite = bottomSheetLayout.findViewById(R.id.layout_favorite_bs);
+                LinearLayout infor = bottomSheetLayout.findViewById(R.id.layout_infor_bs);
+                LinearLayout delete = bottomSheetLayout.findViewById(R.id.layout_delete_bs);
 
+                // xử lý sự kiện
                 playlist.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (music.isCheck_playlist()) {
                             Toast.makeText(getContext(), "Bài hát này đã có sẵn trong Playlist", Toast.LENGTH_SHORT).show();
                         } else {
+                            // hàm sẽ dc overite lại tại OfflineActivity
+                            // khi đó OfflineActivity sẽ nhận dc position và trạng playlist của bài hát dc chọn, để xử lý
                             listener1.onInpuSent1(position, true);
                         }
-                        bottomSheetDialog.dismiss();
+                        bottomSheetDialog.dismiss(); // đóng bottomSheet
                     }
                 });
                 favorite.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +135,7 @@ public class ListSongFragment extends Fragment {
                         if (music.isCheck_fav()) {
                             Toast.makeText(getContext(), "Bài hát này đã có sẵn trong Yêu Thích", Toast.LENGTH_SHORT).show();
                         } else {
+                            // tương tự
                             listener1.onInpuSent1(position, false);
                         }
                         bottomSheetDialog.dismiss();
@@ -141,6 +147,7 @@ public class ListSongFragment extends Fragment {
                         SimpleDateFormat format_date = new SimpleDateFormat("dd/MM/yyyy");
                         SimpleDateFormat format_duration = new SimpleDateFormat("mm:ss");
 
+                        // show dialog thông tin của bài hát
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                         builder.setTitle("Thông Tin Bài Hát");
                         builder.setIcon(new BitmapDrawable(getResources(), bitmap));
@@ -154,7 +161,7 @@ public class ListSongFragment extends Fragment {
                     public void onClick(View v) {
                         File file = new File(music.getPath());
                         if (file.delete()) {
-                            Toast.makeText(getContext(), "Đã xóa bài hát '"+music.getNameSong()+"' thành công", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Đã xóa bài hát '" + music.getNameSong() + "' thành công", Toast.LENGTH_SHORT).show();
                             listener2.onInpuSent2(position);
                         }
                         bottomSheetDialog.dismiss();
@@ -172,10 +179,15 @@ public class ListSongFragment extends Fragment {
                 String path = music.getPath();
                 File file = new File(path);
 
+                // khi lấy dc file
+                // kiểm tra file đó có tồn tại hay k
+                // mục đích là để xử lý trường hợp: user ra ngoài xóa 1 file mp3 từ ứng dụng khác
                 if (file.exists()) {
                     date_download = file.lastModified();
                     parent = file.getParentFile().getName();
 
+                    // google: extra file mp3 in android
+                    // ở đây dùng thằng MediaMetadataRetriever để lấy duration, genre, bitmap(ảnh file mp3)
                     MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                     mmr.setDataSource(path);
 
@@ -183,6 +195,8 @@ public class ListSongFragment extends Fragment {
                     genre = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 
                     byte[] data = mmr.getEmbeddedPicture();
+                    // nếu data khác null thì set ảnh qua bitmap lấy dc
+                    // ngược lại set ảnh từ resource của ta
                     if (data != null) {
                         bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                     } else {
@@ -196,10 +210,10 @@ public class ListSongFragment extends Fragment {
                     }
                     mmr.release();
                     imgAvatar.setImageBitmap(bitmap);
-                } else {
-                    check_show_bs = true;
+                } else { // file đã bị xóa nên set lại là k cho mở bottomSheet
+                    check_show_bs = true; // set trạng thái show bottomSheet = true, có nghĩa là k cho show
                     Toast.makeText(getContext(), "Bài hát '" + music.getNameSong() + "' đã bị xóa khỏi bộ nhớ!", Toast.LENGTH_SHORT).show();
-                    delete_arrMusic_local(position);
+                    delete_arrMusic_local(position); // xóa phần tử trong a
                     arrMusic.remove(position);
                     setArrMusic(position);
                 }
@@ -211,12 +225,13 @@ public class ListSongFragment extends Fragment {
         recyclerView.setAdapter(musicAdapter);
         recyclerView.setHasFixedSize(true);
 
-
+        // custom đường gạch chân dưới item recyclerView
         DividerItemDecoration dividerItemDecorationvider = new DividerItemDecoration(getContext(), new LinearLayoutManager(getContext()).getOrientation());
         Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.custom_divider);
         dividerItemDecorationvider.setDrawable(drawable);
-        recyclerView.addItemDecoration(dividerItemDecorationvider);
+        recyclerView.addItemDecoration(dividerItemDecorationvider); // gán vào
 
+        // thay đổi màu nền
         if (KEY_LIST_SONG.equals("playlists")) {
             Log.d("EEE", "ListSongFragment playlist");
             relativeLayout.setBackgroundResource(R.drawable.custom_background_playlists);
@@ -226,15 +241,14 @@ public class ListSongFragment extends Fragment {
             relativeLayout.setBackgroundResource(R.drawable.custom_background_favorites);
         }
 
+        // MusicAdapter truyền position cho ListSongFragment
+        // ListSongFragment lại truyền position cho OfflineActivity
         musicAdapter.setOnItemClickListener(new MusicAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                //String nameSong = arrMusic.get(position).getNameSong();
                 listener.onInpuSent(position);
             }
         });
-
-        Log.d("TTT", "ListSongFragment");
 
         return view;
     }
@@ -250,7 +264,7 @@ public class ListSongFragment extends Fragment {
         if (context instanceof FragmentContactListener) {
             listener = (FragmentContactListener) context;
             listener1 = (AddFavPlaylistListener) context;
-            listener2= (DeleteSongListener) context;
+            listener2 = (DeleteSongListener) context;
         } else {
             throw new RuntimeException(context.toString() + "must implement FragmentContactListener");
         }
@@ -261,7 +275,7 @@ public class ListSongFragment extends Fragment {
         super.onDetach();
         listener = null;
         listener1 = null;
-        listener2=null;
+        listener2 = null;
     }
 
     @Override

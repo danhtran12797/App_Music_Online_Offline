@@ -1,7 +1,7 @@
 package com.danhtran12797.thd.app_music2019.Activity;
 
 import android.Manifest;
-import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,19 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,6 +27,18 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.danhtran12797.thd.app_music2019.Model.Music;
 import com.danhtran12797.thd.app_music2019.R;
 import com.google.android.gms.ads.AdRequest;
@@ -47,6 +46,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -73,7 +74,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     private Switch mSwitch;
     private RelativeLayout layout_on, layout_off;
 
-    private Dialog dialog_load_data;
+    //private Dialog dialog_load_data;
 
     private long backPressedTime;
     private Toast backToast;
@@ -89,9 +90,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     private ArrayList<Music> arrFav;
     private ArrayList<Music> arrPlaylist;
 
-//    public static ArrayList<Music> arrSong;
-//    public static ArrayList<Music> arrFav;
-
     public ArrayList<String> arrID_Fav;
     public ArrayList<String> arrID_Playlist;
 
@@ -100,8 +98,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     private Toolbar toolbar;
     private DrawerLayout drawer;
 
-    //    private FirebaseDatabase database;
-//    private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -109,16 +105,13 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     private TextView txt_name_user, txt_mail;
     private CircleImageView img_avatar;
 
-    //    private ArrayList<MusicOn> arrMusicVN;
-//    private ArrayList<MusicOn> arrMusicAu;
-//    private ArrayList<MusicOn> arrMusicA;
     private boolean isLogin = false;
 
     public static String url_avatar;
     public static String name_user;
     private Intent intent;
 
-    PrettyDialog pDialog;
+    private PrettyDialog pDialog;
 
     public static final int STARTUP_DELAY = 300;
     public static final int ANIM_ITEM_DURATION = 1000;
@@ -132,6 +125,8 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
 
         setContentView(R.layout.activity_load);
 
+        Log.d("CCC", "onCreate: ");
+
         MobileAds.initialize(this,
                 "ca-app-pub-3584305127333859~7316781574");
 
@@ -139,54 +134,19 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
-        toolbar = findViewById(R.id.toolbar_home);
-        setSupportActionBar(toolbar);
+        initView();
+        createDrawer();
 
-        layout_on = findViewById(R.id.layout_on);
-        layout_off = findViewById(R.id.layout_off);
-
-        btnFav = findViewById(R.id.btnFav);
-        btnPlaylist = findViewById(R.id.btnPlaylists);
-        btnSong = findViewById(R.id.btnSongs);
-        btnViet = findViewById(R.id.btnVietNam);
-        btnAuMy = findViewById(R.id.btnAuMy);
-        btnChauA = findViewById(R.id.btnChauA);
-
-        mSwitch = findViewById(R.id.sw_On_Off);
-
-        btnFav.setOnClickListener(this);
-        btnSong.setOnClickListener(this);
-        btnPlaylist.setOnClickListener(this);
-        btnViet.setOnClickListener(this);
-        btnChauA.setOnClickListener(this);
-        btnAuMy.setOnClickListener(this);
-
-//        database = FirebaseDatabase.getInstance();
-//        myRef = database.getReference("2").child("data");
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        //drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        header = navigationView.getHeaderView(0);
-        txt_mail = header.findViewById(R.id.txt_mail_nav);
-        txt_name_user = header.findViewById(R.id.txt_name_user_nav);
-        img_avatar = header.findViewById(R.id.img_avatar_nav);
-
         arrSong = new ArrayList<>();
 
-        dialog_load_data = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        dialog_load_data.setContentView(R.layout.layout_dialog_load_data);
+        // show dialog full screen to load data
+//        dialog_load_data = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+//        dialog_load_data.setContentView(R.layout.layout_dialog_load_data);
 
+        // check permission
         if (ContextCompat.checkSelfPermission(LoadActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -196,6 +156,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
             new LoadSong().execute();
         }
 
+        //event change switch
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -259,6 +220,45 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         });
     }
 
+    private void createDrawer() {
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        header = navigationView.getHeaderView(0);
+        txt_mail = header.findViewById(R.id.txt_mail_nav);
+        txt_name_user = header.findViewById(R.id.txt_name_user_nav);
+        img_avatar = header.findViewById(R.id.img_avatar_nav);
+    }
+
+    private void initView() {
+        toolbar = findViewById(R.id.toolbar_home);
+        setSupportActionBar(toolbar);
+
+        layout_on = findViewById(R.id.layout_on);
+        layout_off = findViewById(R.id.layout_off);
+
+        btnFav = findViewById(R.id.btnFav);
+        btnPlaylist = findViewById(R.id.btnPlaylists);
+        btnSong = findViewById(R.id.btnSongs);
+        btnViet = findViewById(R.id.btnVietNam);
+        btnAuMy = findViewById(R.id.btnAuMy);
+        btnChauA = findViewById(R.id.btnChauA);
+
+        mSwitch = findViewById(R.id.sw_On_Off);
+
+        btnFav.setOnClickListener(this);
+        btnSong.setOnClickListener(this);
+        btnPlaylist.setOnClickListener(this);
+        btnViet.setOnClickListener(this);
+        btnChauA.setOnClickListener(this);
+        btnAuMy.setOnClickListener(this);
+    }
+
     private void animate() {
         ViewGroup container = findViewById(R.id.layout_off);
 
@@ -302,7 +302,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                             display_user(document, currentUser.getEmail());
                         } else {
-                            dialog_load_data.dismiss();
+//                            dialog_load_data.dismiss();
                             Intent intent = new Intent(LoadActivity.this, AccountActivity.class);
                             startActivity(intent);
                             //finish();
@@ -330,7 +330,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("LLL", "onStart");
+        Log.d("CCC", "onStart");
         if (!isOnline()) {
             layout_on.setVisibility(View.GONE);
             layout_off.setVisibility(View.VISIBLE);
@@ -343,16 +343,27 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.d("CCC", "LoadActivity: onRestart ");
+        Log.d("CCC", "onRestart ");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("LLL", "onResume");
+        Log.d("CCC", "onResume");
         btnSong.setText("Bài hát(" + arrSong.size() + ")");
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("CCC", "onStop: ");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("CCC", "onDestroy: ");
+    }
 
     public ArrayList<Music> scanDeviceForMp3Files() {
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
@@ -533,6 +544,16 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         alertDialog.show();
     }
 
+    public void rateMe() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=" + getPackageName())));
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
+        }
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
@@ -559,6 +580,9 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
                 });
                 builder.show();
                 break;
+            case R.id.menu_rate_app:
+                rateMe();
+                break;
             case R.id.menu_logout_app:
                 Toast.makeText(this, "Đã đăng xuất tài khoản " + mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
                 mAuth.signOut();
@@ -578,7 +602,7 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog_load_data.show();
+//            dialog_load_data.show();
         }
 
         @Override
@@ -586,11 +610,10 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener, 
             super.onPostExecute(aVoid);
 
             animate();
-            dialog_load_data.dismiss();
+//            dialog_load_data.dismiss();
             btnFav.setText("Yêu thích(" + arrFav.size() + ")");
             btnPlaylist.setText("Playlist(" + arrPlaylist.size() + ")");
             btnSong.setText("Bài hát(" + arrSong.size() + ")");
-            Log.d("CCC", "LoadActivity: onPostExecute");
         }
 
         @Override

@@ -1,8 +1,10 @@
 package com.danhtran12797.thd.app_music2019.Activity;
 
 import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,15 +15,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,12 +30,22 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
 import com.danhtran12797.thd.app_music2019.Adapter.ViewPagerAdapter;
 import com.danhtran12797.thd.app_music2019.Fragment.DiscFragment;
 import com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment;
 import com.danhtran12797.thd.app_music2019.Fragment.LyricFragment;
 import com.danhtran12797.thd.app_music2019.Model.Music;
 import com.danhtran12797.thd.app_music2019.R;
+import com.danhtran12797.thd.app_music2019.Receiver.HeadSetReceiver;
+import com.danhtran12797.thd.app_music2019.Receiver.MediaButtonIntentReceiver;
 import com.thekhaeng.pushdownanim.PushDownAnim;
 
 import java.io.BufferedReader;
@@ -63,9 +69,9 @@ import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.musi
 import static com.danhtran12797.thd.app_music2019.Fragment.ListSongFragment.recyclerView;
 import static com.thekhaeng.pushdownanim.PushDownAnim.MODE_SCALE;
 
-
 public class OfflineActivity extends AppCompatActivity implements ListSongFragment.FragmentContactListener, View.OnClickListener
-        , AudioManager.OnAudioFocusChangeListener, ListSongFragment.AddFavPlaylistListener, ListSongFragment.DeleteSongListener{
+        , AudioManager.OnAudioFocusChangeListener, ListSongFragment.AddFavPlaylistListener,
+        ListSongFragment.DeleteSongListener, MediaButtonIntentReceiver.MediaButtonListener, HeadSetReceiver.IHeadSet {
     private ViewPager viewPager;
     public ViewPagerAdapter viewPagerAdapter;
     //private TabLayout tabLayout;
@@ -82,7 +88,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     SimpleDateFormat format;
     Window window;
 
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer = null;
     public static ArrayList<Music> arrMusic;
     private Intent intent;
 
@@ -98,6 +104,12 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     private String id_playlist = "";
 
     private boolean check_change_share = false;
+    private int count_media_button = 0;
+    private boolean check_random = false;
+    private boolean check_loop = false;
+
+    private MediaButtonIntentReceiver r;
+    private HeadSetReceiver headSetReceiver;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -105,16 +117,20 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline);
 
+        headSetReceiver = new HeadSetReceiver(this);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(headSetReceiver, filter);
+
+        r = new MediaButtonIntentReceiver(this);
+        ((AudioManager) getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(
+                new ComponentName(
+                        getPackageName(),
+                        MediaButtonIntentReceiver.class.getName()));
+
         thumbView = LayoutInflater.from(this).inflate(R.layout.layout_seekbar_thumb, null, false);
 
         viewPager = findViewById(R.id.viewPager);
-        //tabLayout = findViewById(R.id.tabLayout);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-//        tabLayout.setupWithViewPager(viewPager);
-//        tabLayout.getTabAt(0).setIcon(R.drawable.ic_call);
-//        tabLayout.getTabAt(1).setIcon(R.drawable.ic_contact);
-        //tabLayout.getTabAt(2).setIcon(R.drawable.ic_favorite);
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("danhtran12797");
@@ -133,8 +149,8 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         btnFav.setTag(false);
         btnPlaylist.setTag(false);
 
-        btnLoop.setTag(false);
-        btnRandom.setTag(false);
+//        btnLoop.setTag(false);
+//        btnRandom.setTag(false);
 
         format = new SimpleDateFormat("m:ss");
 
@@ -174,9 +190,8 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             }
             Log.d("AAA", "intent");
 
-            check_fav_playlist(this.position);
+//            check_fav_playlist(this.position);
         }
-
 
         PushDownAnim.setPushDownAnimTo(btnRandom, btnPlay, btnNext, btnLoop, btnPre, btnFav, btnPlaylist)
                 .setScale(MODE_SCALE, 0.8f)
@@ -207,9 +222,9 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         DiscFragment discFragment = new DiscFragment();
         LyricFragment lyricFragment = new LyricFragment();
 
-        viewPagerAdapter.addFragment(listSongFragment, "");
-        viewPagerAdapter.addFragment(discFragment, "");
-        viewPagerAdapter.addFragment(lyricFragment, "");
+        viewPagerAdapter.addFragment(listSongFragment);
+        viewPagerAdapter.addFragment(discFragment);
+        viewPagerAdapter.addFragment(lyricFragment);
 
         viewPager.setOffscreenPageLimit(2); // k cho tạo mới khi lướt tới
         //viewPager.setOffscreenPageLimit(0);
@@ -272,7 +287,6 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
 
     //check song is Playlist => chuỗi playlists để gửi lên sharePreference
     public void get_string_id(ArrayList<Music> arr) {
-        //Log.d("III","arr: "+arr.size());
         if (arr.size() != 0) {
             for (int i = 0; i < arr.size(); i++) {
                 if (arr.get(i).isCheck_playlist()) {
@@ -310,6 +324,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("HHH", "onStop: ");
         if (check_change_share)
             save_preferent();
     }
@@ -345,10 +360,14 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("DDD", "onDestroy");
         audioManager.abandonAudioFocus(this);
         check_onBackPressed = true;
         stopPlayer();
+        unregisterReceiver(headSetReceiver);
+        ((AudioManager) getSystemService(AUDIO_SERVICE)).unregisterMediaButtonEventReceiver(
+                new ComponentName(
+                        getPackageName(),
+                        MediaButtonIntentReceiver.class.getName()));
 
     }
 
@@ -377,6 +396,47 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         seekBar.setMax(mediaPlayer.getDuration());
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void pausePlayer() {
+        new CountDownTimer(900, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.d("HHH", "onTick: " + millisUntilFinished / 1000f);
+                mediaPlayer.setVolume(millisUntilFinished / 1000f, millisUntilFinished / 1000f);
+            }
+
+            @Override
+            public void onFinish() {
+                Log.d("HHH", "onFinish: ");
+                mediaPlayer.pause();
+            }
+        }.start();
+        objectAnimator.pause();
+        musicAdapter.setCheckPause(true); // pause VuMeterView
+        btnPlay.setImageResource(R.drawable.ic_play);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void resumePlayer() {
+        new CountDownTimer(900, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.d("OOO", "onTick: " + (1 - millisUntilFinished / 1000f));
+                mediaPlayer.setVolume((1 - millisUntilFinished / 1000f), (1 - millisUntilFinished / 1000f));
+            }
+
+            @Override
+            public void onFinish() {
+                Log.d("OOO", "onFinish: ");
+                mediaPlayer.setVolume(1.0f, 1.0f);
+            }
+        }.start();
+        mediaPlayer.start();
+        objectAnimator.resume();
+        musicAdapter.setCheckPause(false); // pause VuMeterView (heart)
+        btnPlay.setImageResource(R.drawable.ic_pause);
+    }
+
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View v) {
@@ -394,21 +454,17 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     position = new Random().nextInt(arrMusic.size());
                     check_frist_play_music = true;
                     btnPlay.setImageResource(R.drawable.ic_pause);
-                    Log.d("FFF", "check_frist_play_music");
                     startPlayer();
                 } else {
-                    if (mediaPlayer.isPlaying()) {
-                        Log.d("FFF", "isPlaying");
-                        objectAnimator.pause();
-                        musicAdapter.setCheckPause(true); // pause VuMeterView (heart)
-                        btnPlay.setImageResource(R.drawable.ic_play);
-                        mediaPlayer.pause();
+                    if (mediaPlayer != null) {
+                        if (mediaPlayer.isPlaying()) {
+                            pausePlayer();
+                        } else {
+                            resumePlayer();
+                        }
                     } else {
-                        Log.d("FFF", "else");
-                        objectAnimator.resume();
-                        musicAdapter.setCheckPause(false); // pause VuMeterView (heart)
                         btnPlay.setImageResource(R.drawable.ic_pause);
-                        mediaPlayer.start();
+                        startPlayer();
                     }
                 }
                 break;
@@ -419,34 +475,25 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     check_frist_play_music = true;
                     btnPlay.setImageResource(R.drawable.ic_pause);
                 } else {
-                    if (btnLoop.getTag().equals(false) && btnRandom.getTag().equals(false)) {
-                        if (position == 0) {
-                            position = arrMusic.size() - 2;
-                        } else if (position == 1) {
-                            position = -1;
-                        } else
-                            position -= 2;
+                    position--;
+                    if (check_loop) {
+                        position++;
                     }
-                    if (btnLoop.getTag().equals(true)) {
-                        position--;
-                        if (position <= -1) {
-                            position = arrMusic.size() - 1;
-                        }
-                    }
+                    position = position < 0 ? arrMusic.size() - 1 : position;
                 }
                 startPlayer();
 
                 break;
             case R.id.btnLoop:
-                if (btnLoop.getTag().equals(false)) {
+                if (check_loop == false) {
                     btnLoop.setImageResource(R.drawable.ic_sync_blu);
-                    btnLoop.setTag(true);
+                    check_loop = true;
                 } else {
                     btnLoop.setImageResource(R.drawable.ic_sync);
-                    btnLoop.setTag(false);
+                    check_loop = false;
                 }
                 btnRandom.setImageResource(R.drawable.ic_random);
-                btnRandom.setTag(false);
+                check_random = false;
 
                 break;
             case R.id.btnNext:
@@ -456,26 +503,25 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                     check_frist_play_music = true;
                     btnPlay.setImageResource(R.drawable.ic_pause);
                 } else {
-                    if (btnLoop.getTag().equals(true)) {
+                    position++;
+                    if (check_loop) {
                         position++;
-                        if (position >= arrMusic.size()) {
-                            position = 0;
-                        }
                     }
+                    position = position >= arrMusic.size() ? 0 : position;
                 }
                 startPlayer();
 
                 break;
             case R.id.btnRandom:
-                if (btnRandom.getTag().equals(false)) {
+                if (check_random == false) {
                     btnRandom.setImageResource(R.drawable.ic_random_blu);
-                    btnRandom.setTag(true);
+                    check_random = true;
                 } else {
                     btnRandom.setImageResource(R.drawable.ic_random);
-                    btnRandom.setTag(false);
+                    check_random = false;
                 }
                 btnLoop.setImageResource(R.drawable.ic_sync);
-                btnLoop.setTag(false);
+                check_loop = false;
 
                 break;
             case R.id.imgFav:
@@ -515,7 +561,6 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         }
     }
 
-
     // kiểm tra arr đưa vào có trùng với id bài hát hiện tại
     public int getIdMusic(int position, ArrayList<Music> arr) {
         String idMusic = arrMusic.get(position).getId();
@@ -528,46 +573,37 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     }
 
     public void startPlayer() {
-        stopPlayer();
-        check_onBackPressed = false;
-        if (btnLoop.getTag().equals(false) && btnRandom.getTag().equals(false)) {
-            position++;
-            if (position >= arrMusic.size()) {
-                position = 0;
-            }
-        }
-
-        if (btnRandom.getTag().equals(true)) {
-            position = new Random().nextInt(arrMusic.size());
-        }
-        if (btnLoop.getTag().equals(true)) {
-            if (position >= arrMusic.size())
-                position = 0;
-            if (position < 0)
-                position = 0;
-        }
-
         if (arrMusic.size() == 0) {
             toolbar.setTitle("NO SONGS!!!");
-            objectAnimator.cancel();
-            objectAnimator.clone();
+            objectAnimator.end();
             check_onBackPressed = true;
             Toast.makeText(this, "NO SONGS!!!", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        stopPlayer();
+        check_onBackPressed = false;
+        if (check_loop) {
+            position--;
+            position = position < 0 ? arrMusic.size() - 1 : position;
+        }
+
+        position = position >= arrMusic.size() ? 0 : position;
+
+        if (check_random) {
+            position = new Random().nextInt(arrMusic.size());
+        }
+
         Music music = arrMusic.get(position);
         if (!new File(music.getPath()).exists()) {
             Toast.makeText(this, "Bài hát '" + music.getNameSong() + "' đã bị xóa khỏi bộ nhớ!", Toast.LENGTH_SHORT).show();
-            Log.d("PPP", arrMusic.get(position).getNameSong());
             delete_arrMusic_local(position); // xóa arrSong(arrSong, arrFav, arrPlaylist) gốc
             arrMusic.remove(position);
-
 
             Fragment fragment = viewPagerAdapter.getItem(0);
             if (fragment instanceof ListSongFragment) {
                 ((ListSongFragment) fragment).setArrMusic(position);
-                position--;
+//                position--;
                 startPlayer();
             }
             return;
@@ -589,7 +625,6 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
             Log.d("AAAA", e.getMessage() + "danh_1");
         }
 
-
         try {
             mediaPlayer.prepare(); // might take long! (for buffering, etc)
         } catch (IOException e) {
@@ -605,6 +640,7 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                position++;
                 startPlayer();
             }
         });
@@ -631,7 +667,6 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         setTimeTotal();
         updateTimeSong();
 
-        Log.d("FFF", "end StartPlayer");
     }
 
     // Create lyric(arrList)
@@ -712,21 +747,19 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
     @Override
     public void onInpuSent(int position) {
         this.position = position;
-
-        this.position--;
+        if (check_loop) {
+            position++;
+            this.position = position >= arrMusic.size() ? 0 : position;
+        }
         btnPlay.setImageResource(R.drawable.ic_pause);
         if (check_frist_play_music == false) {
             check_frist_play_music = true;
         }
-
-        if (btnLoop.getTag().equals(true))
-            this.position++;
         startPlayer();
     }
 
     // xóa arrSong(arrSong, arrFav, arrPlaylist) gốc
     public static void delete_arrMusic_local(int position) {
-        //Music song_delete = arrSong.get(position);
         String idMusic = arrMusic.get(position).getId();
         for (int i = 0; i < arrSong.size(); i++) {
             if (idMusic.equals(arrSong.get(i).getId())) {
@@ -736,48 +769,39 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onAudioFocusChange(int focusChange) { // check audio từ bên ngoài
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 Log.d("DDD", "AUDIOFOCUS_GAIN");
-                // resume playback
-//                if (mediaPlayer == null){ //initMediaPlayer();
-//                    mediaPlayer=new MediaPlayer();
-//                }
-//                else if (!mediaPlayer.isPlaying()) mediaPlayer.start();
-//                mediaPlayer.setVolume(1.0f, 1.0f);
+                if (mediaPlayer == null) {
+
+                } else if (!mediaPlayer.isPlaying()) {
+                    resumePlayer();
+                }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.d("DDD", "AUDIOFOCUS_LOSS");
-                // Lost focus for an unbounded amount of time: stop playback and release media player
-                if (mediaPlayer.isPlaying()) {
-                    check_onBackPressed = true; //
-                    btnPlay.setImageResource(R.drawable.ic_play);
-                    mediaPlayer.stop();
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        pausePlayer();
+                    }
                 }
-                check_frist_play_music = false;
-                mediaPlayer.release();
-                mediaPlayer = null;
-
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.d("DDD", "AUDIOFOCUS_LOSS_TRANSIENT");
-                // Lost focus for a short time, but we have to stop
-                // playback. We don't release the media player because playback
-                // is likely to resume
-                if (mediaPlayer.isPlaying()) {
-                    btnPlay.setImageResource(R.drawable.ic_play);
-                    mediaPlayer.pause();
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        pausePlayer();
+                    }
                 }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 Log.d("DDD", "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                // Lost focus for a short time, but it's ok to keep playing
-                // at an attenuated level
                 if (mediaPlayer.isPlaying()) mediaPlayer.setVolume(0.1f, 0.1f);
                 break;
         }
@@ -809,9 +833,78 @@ public class OfflineActivity extends AppCompatActivity implements ListSongFragme
         musicAdapter.notifyItemRemoved(position);
 
         if (this.position == position) {
-            //check_fav_playlist(this.position);
-            this.position--;
+//            this.position--;
             startPlayer();
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void processMediaButton(int t) {
+        if (t == 1) {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    Log.d("EEE", "processMediaButton: PLAYING");
+                    pausePlayer();
+                } else {
+                    Log.d("EEE", "processMediaButton: PAUSE");
+                    resumePlayer();
+                }
+            }
+        } else if (t == 2) {
+            if (!check_frist_play_music) {
+                position = new Random().nextInt(arrMusic.size());
+                check_frist_play_music = true;
+                btnPlay.setImageResource(R.drawable.ic_pause);
+            } else {
+                position++;
+                if (check_loop) {
+                    position++;
+                }
+                position = position >= arrMusic.size() ? 0 : position;
+            }
+            startPlayer();
+        }
+    }
+
+    @Override
+    public void onMediaButtonSent() {
+        count_media_button++;
+        new Handler().postDelayed(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                processMediaButton(count_media_button);
+                count_media_button = 0;
+            }
+        }, 400);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onHeadSetOffline(int state) {
+        switch (state) {
+            case 0:
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.pause();
+                        objectAnimator.pause();
+                        musicAdapter.setCheckPause(true); // pause VuMeterView
+                        btnPlay.setImageResource(R.drawable.ic_play);
+                    }
+                }
+                break;
+            case 1:
+                if (mediaPlayer != null) {
+                    if (!mediaPlayer.isPlaying()) {
+                        resumePlayer();
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onHeadSetOnline(int state) {
+
     }
 }

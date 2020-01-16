@@ -20,6 +20,10 @@
         android:id="@+id/menu_infor_app"
         android:icon="@drawable/ic_music"
         android:title="Thông tin ứng dụng" />
+    <item
+        android:id="@+id/menu_rate_app"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="Đánh giá"/>
 
     <item
         android:id="@+id/menu_logout_app"

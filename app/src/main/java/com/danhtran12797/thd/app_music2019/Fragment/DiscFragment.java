@@ -6,9 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +30,10 @@ public class DiscFragment extends Fragment {
     public static CircleImageView imgAvatarSong;
     private RelativeLayout relativeLayout;
     public static ObjectAnimator objectAnimator;
+
+    public static DiscFragment newInstance() {
+        return new DiscFragment();
+    }
 
     @Nullable
     @Override
@@ -55,8 +59,6 @@ public class DiscFragment extends Fragment {
         objectAnimator.setRepeatMode(ValueAnimator.RESTART);
         objectAnimator.setInterpolator(new LinearInterpolator());
         objectAnimator.setTarget(imgAvatarSong);
-
-        Log.d("TTT", "DiscFragment");
 
         return view;
     }
