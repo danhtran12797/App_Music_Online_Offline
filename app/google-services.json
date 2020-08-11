@@ -1,52 +1,37 @@
 {
   "project_info": {
-    "project_number": "924460425201",
-    "firebase_url": "https://appmusicfrist.firebaseio.com",
-    "project_id": "appmusicfrist",
-    "storage_bucket": "appmusicfrist.appspot.com"
+    "project_number": "584088107069",
+    "firebase_url": "https://app-music-test.firebaseio.com",
+    "project_id": "app-music-test",
+    "storage_bucket": "app-music-test.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:924460425201:android:6fa2d60b3c9864c7",
+        "mobilesdk_app_id": "1:584088107069:android:2afef14f8fa0086b141254",
         "android_client_info": {
-          "package_name": "com.danhtran12797.thd.app_music2019"
+          "package_name": "com.danhtran12797.thd.app_music_test"
         }
       },
       "oauth_client": [
         {
-          "client_id": "924460425201-pbib3s9lga9c63hld2rp9kkr2ira8v7b.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.danhtran12797.thd.app_music2019",
-            "certificate_hash": "f20eadb14df4d1f7a90c6924a997029d10d479c0"
-          }
-        },
-        {
-          "client_id": "924460425201-r5kdutpgbri1dts9rj7o6kki0r2q25ko.apps.googleusercontent.com",
+          "client_id": "584088107069-80nlcpaj5rqmcho90ban3jf6oi9oo90k.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAPViJYPttSBSg9I7CCt66AMy6JMdqtzec"
+          "current_key": "AIzaSyDMP-t8MfHL66yrxAD3-3vyCimFUHiXwWk"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "924460425201-r5kdutpgbri1dts9rj7o6kki0r2q25ko.apps.googleusercontent.com",
+              "client_id": "584088107069-80nlcpaj5rqmcho90ban3jf6oi9oo90k.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

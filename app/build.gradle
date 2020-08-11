@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.danhtran12797.thd.app_music2019"
+        applicationId "com.danhtran12797.thd.app_music_test"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 24
-        versionName "2.4"
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
